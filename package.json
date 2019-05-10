@@ -1,0 +1,14 @@
+{
+  "name": "example-collection",
+  "version": "1.0.0",
+  "description": "three.js例子集",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Jaiz",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^5.0.1"
+  }
+}
