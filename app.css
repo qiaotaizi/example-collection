@@ -1,0 +1,31 @@
+table{
+    border: 1px black solid;
+}
+thead{
+    background-color: darkgray;
+}
+td{
+    border: 1px black solid;
+}
+th{
+    border: 1px black solid;
+}
+th.th0{
+    width: 100px;
+}
+th.th1{
+    width: 500px;
+}
+td.td0{
+    text-align: center;
+}
+#hint{
+    color: red;
+    font-style: italic;
+    font-weight: bold;
+}
+.example-list{
+    display: inline-block;
+    list-style-type: disc;
+    margin-right: 10px;
+}
