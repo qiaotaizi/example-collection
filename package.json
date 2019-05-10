@@ -4,12 +4,15 @@
   "description": "three.js例子集",
   "main": "index.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package": "electron-packager ./ example-collection --platform=win32 --arch=x64 --out ../../electronOutput --electron-version 5.0.1 --overwrite"
   },
   "author": "Jaiz",
   "license": "BSD",
+  "devDependencies": {
+    "electron": "^5.0.1"
+  },
   "dependencies": {
-    "electron": "^5.0.1",
     "three": "^0.104.0",
     "three-orbitcontrols": "^2.102.1"
   }
