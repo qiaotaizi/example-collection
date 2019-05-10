@@ -1,7 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * 画面渲染代码
+ */
 const three_1 = require("three");
 const OrbitControls = require('three-orbitcontrols');
+const { clothFunction, cloth } = require("./clothC");
 let camera, scene, renderer;
 init();
 animate();
@@ -73,6 +77,19 @@ function init() {
     ggMesh1.position.set(-125, -250, 0);
     rcShadow(ggMesh1);
     scene.add(ggMesh1);
+    //添加布
+    let clothTexture = textureLoader.load("../assets/circuit_pattern.png");
+    clothTexture.anisotropy = 16;
+    let clothMat = new three_1.MeshLambertMaterial({
+        map: clothTexture,
+        side: three_1.DoubleSide,
+        alphaTest: 0.5
+    });
+    let clothGeo = new three_1.ParametricBufferGeometry(clothFunction, cloth.w, cloth.h);
+    let clothMesh = new three_1.Mesh(clothGeo, clothMat);
+    clothMesh.position.set(0, 0, 0);
+    clothMesh.castShadow = true;
+    scene.add(clothMesh);
     //renderer
     renderer = new three_1.WebGLRenderer({
         antialias: true //抗锯齿
