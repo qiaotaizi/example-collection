@@ -46,6 +46,33 @@ function init() {
     groundMesh.rotation.x = -Math.PI / 2; //转向90°
     groundMesh.receiveShadow = true;
     scene.add(groundMesh);
+    //添加杆子
+    let poleGeo = new three_1.BoxBufferGeometry(5, 375, 5);
+    let poleMat = new three_1.MeshLambertMaterial();
+    //垂直杆子两根
+    let poleVer0 = new three_1.Mesh(poleGeo, poleMat);
+    poleVer0.position.set(-125, -62, 0);
+    rcShadow(poleVer0);
+    scene.add(poleVer0);
+    let poleVer1 = new three_1.Mesh(poleGeo, poleMat);
+    poleVer1.position.set(125, -62, 0);
+    rcShadow(poleVer1);
+    scene.add(poleVer1);
+    //水平杆子一根
+    let poleHor = new three_1.Mesh(new three_1.BoxBufferGeometry(255, 5, 5), poleMat);
+    poleHor.position.set(0, -250 + 750 * 0.5, 0);
+    rcShadow(poleHor);
+    scene.add(poleHor);
+    //两个垂直柱体下方的方块
+    let gg = new three_1.BoxBufferGeometry(10, 10, 10);
+    let ggMesh0 = new three_1.Mesh(gg, poleMat);
+    ggMesh0.position.set(125, -250, 0);
+    rcShadow(ggMesh0);
+    scene.add(ggMesh0);
+    let ggMesh1 = new three_1.Mesh(gg, poleMat);
+    ggMesh1.position.set(-125, -250, 0);
+    rcShadow(ggMesh1);
+    scene.add(ggMesh1);
     //renderer
     renderer = new three_1.WebGLRenderer({
         antialias: true //抗锯齿
@@ -73,5 +100,8 @@ function animate() {
 }
 function render() {
     renderer.render(scene, camera);
+}
+function rcShadow(mesh) {
+    mesh.receiveShadow = mesh.castShadow = true;
 }
 //# sourceMappingURL=cloth.js.map
