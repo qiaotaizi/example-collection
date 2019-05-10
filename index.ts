@@ -4,7 +4,7 @@ const {app,BrowserWindow,Menu}=require("electron");
 let win:any;
 
 function createWindow() {
-    Menu.setApplicationMenu(null);
+    //Menu.setApplicationMenu(null);
     win=new BrowserWindow({
         title:"three例子集",
         show:false,//暂不展示,当应用准备就绪时展示

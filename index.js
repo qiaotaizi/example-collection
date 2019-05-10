@@ -3,7 +3,7 @@ const { app, BrowserWindow, Menu } = require("electron");
 //BrowserWindow类型未导出,这里无法明确给出定义win的类型
 let win;
 function createWindow() {
-    Menu.setApplicationMenu(null);
+    //Menu.setApplicationMenu(null);
     win = new BrowserWindow({
         title: "three例子集",
         show: false,
