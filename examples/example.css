@@ -1,5 +1,6 @@
 body{
     margin: 0;
+    background-color: lightgray;
 }
 canvas{
     width: 100%;
