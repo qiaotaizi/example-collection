@@ -8,9 +8,6 @@ function plane(width, height) {
         target.set(x, y, z);
     };
 }
-console.log(constants_1.ClothConstants.DAMPING);
-console.log(constants_1.ClothConstants.restDistance);
-console.log(constants_1.ClothConstants.xSegs);
 let clothFunction = plane(constants_1.ClothConstants.restDistance * constants_1.ClothConstants.xSegs, constants_1.ClothConstants.restDistance * constants_1.ClothConstants.ySegs);
 module.exports = clothFunction;
 //# sourceMappingURL=clothFunction.js.map

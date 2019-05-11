@@ -28,14 +28,10 @@ let cloth = new Cloth(ClothConstants.xSegs, ClothConstants.ySegs);
 let clothGeo: ParametricBufferGeometry;
 
 let tmpForce = new Vector3();
-let GRAVITY = 981 * 1.4;
 
-let gravity = new Vector3(0, -GRAVITY, 0).multiplyScalar(ClothConstants.MASS);
-let TIMESTAMP = 18 / 1000;
-let TIMESTEP_SQ = TIMESTAMP * TIMESTAMP;
+let gravity = new Vector3(0, -ClothConstants.GRAVITY, 0).multiplyScalar(ClothConstants.MASS);
 
 let diff = new Vector3();
-
 
 init();
 
@@ -45,15 +41,6 @@ animate();
  * 初始化对象
  */
 function init() {
-    //常量初始化
-
-    // ClothConstants.DAMPING=0.03;
-    // ClothConstants.DRAG=1-ClothConstants.DAMPING;
-    // ClothConstants.restDistance = 25;
-    // ClothConstants.MASS= 0.1;
-    // ClothConstants.xSegs = 10;
-    // ClothConstants.ySegs = 10;
-
     //scene
     scene = new Scene();
     scene.background = new Color(0xcce0ff);
@@ -226,7 +213,7 @@ function simulate(time: number): void {
     for (let i = 0, il = particles.length; i < il; i++) {
         let particle = particles[i];
         particle.addForce(gravity);
-        particle.integrate(TIMESTEP_SQ);
+        particle.integrate(ClothConstants.TIMESTEP_SQ);
     }
 
     let constraints = cloth.constraints;

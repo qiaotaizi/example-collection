@@ -8,8 +8,9 @@ function createWindow() {
         title: "three例子集",
         show: false,
         webPreferences: {
-            nodeIntegration: true //这个特性开启之后,渲染进程才能够正常调用require方法获取模块
+            nodeIntegration: true,
         },
+        autoHideMenuBar: true,
         resizable: false,
         maximizable: false,
     });

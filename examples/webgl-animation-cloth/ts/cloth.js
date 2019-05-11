@@ -13,10 +13,7 @@ let windForce = new three_1.Vector3(0, 0, 0);
 let cloth = new clothC_1.Cloth(constants_1.ClothConstants.xSegs, constants_1.ClothConstants.ySegs);
 let clothGeo;
 let tmpForce = new three_1.Vector3();
-let GRAVITY = 981 * 1.4;
-let gravity = new three_1.Vector3(0, -GRAVITY, 0).multiplyScalar(constants_1.ClothConstants.MASS);
-let TIMESTAMP = 18 / 1000;
-let TIMESTEP_SQ = TIMESTAMP * TIMESTAMP;
+let gravity = new three_1.Vector3(0, -constants_1.ClothConstants.GRAVITY, 0).multiplyScalar(constants_1.ClothConstants.MASS);
 let diff = new three_1.Vector3();
 init();
 animate();
@@ -24,13 +21,6 @@ animate();
  * 初始化对象
  */
 function init() {
-    //常量初始化
-    // ClothConstants.DAMPING=0.03;
-    // ClothConstants.DRAG=1-ClothConstants.DAMPING;
-    // ClothConstants.restDistance = 25;
-    // ClothConstants.MASS= 0.1;
-    // ClothConstants.xSegs = 10;
-    // ClothConstants.ySegs = 10;
     //scene
     scene = new three_1.Scene();
     scene.background = new three_1.Color(0xcce0ff);
@@ -103,7 +93,6 @@ function init() {
         side: three_1.DoubleSide,
         alphaTest: 0.5
     });
-    console.log(`${cloth.w};;${cloth.h}`);
     clothGeo = new three_1.ParametricBufferGeometry(clothFunction, cloth.w, cloth.h);
     let clothMesh = new three_1.Mesh(clothGeo, clothMat);
     clothMesh.position.set(0, 0, 0);
@@ -181,7 +170,7 @@ function simulate(time) {
     for (let i = 0, il = particles.length; i < il; i++) {
         let particle = particles[i];
         particle.addForce(gravity);
-        particle.integrate(TIMESTEP_SQ);
+        particle.integrate(constants_1.ClothConstants.TIMESTEP_SQ);
     }
     let constraints = cloth.constraints;
     for (let i = 0, il = constraints.length; i < il; i++) {
