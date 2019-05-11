@@ -5,14 +5,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const three_1 = require("three");
 const OrbitControls = require('three-orbitcontrols');
-const { clothFunction, cloth } = require("./clothC");
+const clothC_1 = require("./clothC");
+const constants_1 = require("./constants");
+const clothFunction = require("./clothFunction");
 let camera, scene, renderer;
+let windForce = new three_1.Vector3(0, 0, 0);
+let cloth = new clothC_1.Cloth(constants_1.ClothConstants.xSegs, constants_1.ClothConstants.ySegs);
+let clothGeo;
+let tmpForce = new three_1.Vector3();
+let GRAVITY = 981 * 1.4;
+let gravity = new three_1.Vector3(0, -GRAVITY, 0).multiplyScalar(constants_1.ClothConstants.MASS);
+let TIMESTAMP = 18 / 1000;
+let TIMESTEP_SQ = TIMESTAMP * TIMESTAMP;
+let diff = new three_1.Vector3();
 init();
 animate();
 /**
  * 初始化对象
  */
 function init() {
+    //常量初始化
+    // ClothConstants.DAMPING=0.03;
+    // ClothConstants.DRAG=1-ClothConstants.DAMPING;
+    // ClothConstants.restDistance = 25;
+    // ClothConstants.MASS= 0.1;
+    // ClothConstants.xSegs = 10;
+    // ClothConstants.ySegs = 10;
     //scene
     scene = new three_1.Scene();
     scene.background = new three_1.Color(0xcce0ff);
@@ -85,7 +103,8 @@ function init() {
         side: three_1.DoubleSide,
         alphaTest: 0.5
     });
-    let clothGeo = new three_1.ParametricBufferGeometry(clothFunction, cloth.w, cloth.h);
+    console.log(`${cloth.w};;${cloth.h}`);
+    clothGeo = new three_1.ParametricBufferGeometry(clothFunction, cloth.w, cloth.h);
     let clothMesh = new three_1.Mesh(clothGeo, clothMat);
     clothMesh.position.set(0, 0, 0);
     clothMesh.castShadow = true;
@@ -113,12 +132,79 @@ function init() {
  */
 function animate() {
     requestAnimationFrame(animate);
+    let time = Date.now();
+    let windStrength = Math.cos(time / 2000) * 20 + 40;
+    windForce.set(Math.sin(time / 2000), Math.cos(time / 3000), Math.sin(time / 1000));
+    windForce.normalize();
+    windForce.multiplyScalar(windStrength);
+    simulate(time);
     render();
 }
 function render() {
+    let p = cloth.particles;
+    let clothGeoPosition = clothGeo.attributes.position;
+    for (let i = 0, il = p.length; i < il; i++) {
+        let v = p[i].position;
+        clothGeoPosition.setXYZ(i, v.x, v.y, v.z);
+    }
+    if (!(clothGeoPosition instanceof three_1.InterleavedBufferAttribute)) {
+        clothGeoPosition.needsUpdate = true;
+    }
+    clothGeo.computeVertexNormals();
     renderer.render(scene, camera);
 }
 function rcShadow(mesh) {
     mesh.receiveShadow = mesh.castShadow = true;
+}
+//let lastTime:number;
+//let wind=true;
+function simulate(time) {
+    // if(!lastTime){
+    //     lastTime=time;
+    //     return;
+    // }
+    let particles = cloth.particles;
+    // if(wind){
+    let indx;
+    let normal = new three_1.Vector3();
+    let indices = clothGeo.index;
+    let normals = clothGeo.attributes.normal;
+    for (let i = 0, il = indices.count; i < il; i += 3) {
+        for (let j = 0; j < 3; j++) {
+            indx = indices.getX(i + j);
+            normal.fromBufferAttribute(normals, indx);
+            tmpForce.copy(normal).normalize().multiplyScalar(normal.dot(windForce));
+            particles[indx].addForce(tmpForce);
+        }
+    }
+    // }
+    for (let i = 0, il = particles.length; i < il; i++) {
+        let particle = particles[i];
+        particle.addForce(gravity);
+        particle.integrate(TIMESTEP_SQ);
+    }
+    let constraints = cloth.constraints;
+    for (let i = 0, il = constraints.length; i < il; i++) {
+        let constraint = constraints[i];
+        satisfyConstraints(constraint);
+    }
+    for (let i = 0, il = particles.length; i < il; i++) {
+        let particle = particles[i];
+        let pos = particle.position;
+        if (pos.y < -250) {
+            pos.y = -250;
+        }
+    }
+}
+function satisfyConstraints(constraint) {
+    diff.subVectors(constraint.p1.position, constraint.p2.position);
+    let currentDist = diff.length();
+    if (currentDist === 0) {
+        return;
+    }
+    let correction = diff.multiplyScalar(1 - constraint.distance / currentDist);
+    let correctionHalf = correction.multiplyScalar(0.5);
+    constraint.p1.position.add(correctionHalf);
+    constraint.p2.position.sub(correctionHalf);
 }
 //# sourceMappingURL=cloth.js.map

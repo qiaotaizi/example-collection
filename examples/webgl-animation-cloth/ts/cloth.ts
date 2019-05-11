@@ -5,18 +5,37 @@ import {
     AmbientLight, BoxBufferGeometry,
     Color,
     DirectionalLight, DoubleSide,
-    Fog, Mesh, MeshLambertMaterial, ParametricBufferGeometry,
+    Fog, InterleavedBufferAttribute, Mesh, MeshLambertMaterial, ParametricBufferGeometry,
     PerspectiveCamera, PlaneBufferGeometry, RepeatWrapping,
     Scene,
-    TextureLoader,
+    TextureLoader, Vector3,
     WebGLRenderer
 } from "three";
 
 const OrbitControls = require('three-orbitcontrols');
 
-const {clothFunction,cloth}=require("./clothC");
+import {Cloth, Constraint} from "./clothC";
+import {ClothConstants} from "./constants";
+
+const clothFunction = require("./clothFunction");
 
 let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer;
+
+let windForce = new Vector3(0, 0, 0);
+
+let cloth = new Cloth(ClothConstants.xSegs, ClothConstants.ySegs);
+
+let clothGeo: ParametricBufferGeometry;
+
+let tmpForce = new Vector3();
+let GRAVITY = 981 * 1.4;
+
+let gravity = new Vector3(0, -GRAVITY, 0).multiplyScalar(ClothConstants.MASS);
+let TIMESTAMP = 18 / 1000;
+let TIMESTEP_SQ = TIMESTAMP * TIMESTAMP;
+
+let diff = new Vector3();
+
 
 init();
 
@@ -26,6 +45,15 @@ animate();
  * 初始化对象
  */
 function init() {
+    //常量初始化
+
+    // ClothConstants.DAMPING=0.03;
+    // ClothConstants.DRAG=1-ClothConstants.DAMPING;
+    // ClothConstants.restDistance = 25;
+    // ClothConstants.MASS= 0.1;
+    // ClothConstants.xSegs = 10;
+    // ClothConstants.ySegs = 10;
+
     //scene
     scene = new Scene();
     scene.background = new Color(0xcce0ff);
@@ -107,10 +135,10 @@ function init() {
         side: DoubleSide,
         alphaTest: 0.5
     });
-    let clothGeo=new ParametricBufferGeometry(clothFunction,cloth.w,cloth.h);
-    let clothMesh=new Mesh(clothGeo,clothMat);
-    clothMesh.position.set(0,0,0);
-    clothMesh.castShadow=true;
+    clothGeo = new ParametricBufferGeometry(clothFunction, cloth.w, cloth.h);
+    let clothMesh = new Mesh(clothGeo, clothMat);
+    clothMesh.position.set(0, 0, 0);
+    clothMesh.castShadow = true;
 
     scene.add(clothMesh);
 
@@ -140,11 +168,27 @@ function init() {
  */
 function animate() {
     requestAnimationFrame(animate);
+    let time = Date.now();
+    let windStrength = Math.cos(time / 2000) * 20 + 40;
+    windForce.set(Math.sin(time / 2000), Math.cos(time / 3000), Math.sin(time / 1000));
+    windForce.normalize();
+    windForce.multiplyScalar(windStrength);
+
+    simulate(time);
     render();
 }
 
 function render() {
-
+    let p = cloth.particles;
+    let clothGeoPosition = clothGeo.attributes.position;
+    for (let i = 0, il = p.length; i < il; i++) {
+        let v = p[i].position;
+        clothGeoPosition.setXYZ(i, v.x, v.y, v.z);
+    }
+    if (!(clothGeoPosition instanceof InterleavedBufferAttribute)) {
+        clothGeoPosition.needsUpdate = true;
+    }
+    clothGeo.computeVertexNormals();
     renderer.render(scene, camera);
 }
 
@@ -152,3 +196,63 @@ function rcShadow(mesh: Mesh): void {
     mesh.receiveShadow = mesh.castShadow = true;
 }
 
+//let lastTime:number;
+//let wind=true;
+
+function simulate(time: number): void {
+    // if(!lastTime){
+    //     lastTime=time;
+    //     return;
+    // }
+
+    let particles = cloth.particles;
+
+    // if(wind){
+    let indx: number;
+    let normal = new Vector3();
+    let indices = clothGeo.index;
+    let normals: any = clothGeo.attributes.normal;
+
+    for (let i = 0, il = indices.count; i < il; i += 3) {
+        for (let j = 0; j < 3; j++) {
+            indx = indices.getX(i + j);
+            normal.fromBufferAttribute(normals, indx);
+            tmpForce.copy(normal).normalize().multiplyScalar(normal.dot(windForce));
+            particles[indx].addForce(tmpForce);
+        }
+    }
+    // }
+
+    for (let i = 0, il = particles.length; i < il; i++) {
+        let particle = particles[i];
+        particle.addForce(gravity);
+        particle.integrate(TIMESTEP_SQ);
+    }
+
+    let constraints = cloth.constraints;
+
+    for (let i = 0, il = constraints.length; i < il; i++) {
+        let constraint = constraints[i];
+        satisfyConstraints(constraint);
+    }
+
+    for (let i = 0, il = particles.length; i < il; i++) {
+        let particle = particles[i];
+        let pos = particle.position;
+        if (pos.y < -250) {
+            pos.y = -250;
+        }
+    }
+}
+
+function satisfyConstraints(constraint: Constraint) {
+    diff.subVectors(constraint.p1.position, constraint.p2.position);
+    let currentDist = diff.length();
+    if (currentDist === 0) {
+        return;
+    }
+    let correction = diff.multiplyScalar(1 - constraint.distance / currentDist);
+    let correctionHalf = correction.multiplyScalar(0.5);
+    constraint.p1.position.add(correctionHalf);
+    constraint.p2.position.sub(correctionHalf);
+}
