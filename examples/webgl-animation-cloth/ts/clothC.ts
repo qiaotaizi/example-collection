@@ -59,7 +59,7 @@ export class Cloth {
      */
     constraints: Array<Constraint> = [];
 
-    constructor(public w: number, public h: number) {
+    constructor(public w: number=10, public h: number=10) {
         function index(u: number, v: number): number {
             return u + v * (w + 1);
         }
@@ -67,7 +67,7 @@ export class Cloth {
         //创建particles
         for (let v = 0; v <= h; v++) {
             for (let u = 0; u <= w; u++) {
-                this.particles.push(new Particle(u / w, v / h, 0, ClothConstants.MASS))
+                this.particles.push(new Particle(u / w, v / h, 0, ClothConstants.MASS));
             }
         }
 

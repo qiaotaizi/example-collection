@@ -14,7 +14,6 @@ let cloth = new clothC_1.Cloth(constants_1.ClothConstants.xSegs, constants_1.Clo
 let clothGeo;
 let tmpForce = new three_1.Vector3();
 let gravity = new three_1.Vector3(0, -constants_1.ClothConstants.GRAVITY, 0).multiplyScalar(constants_1.ClothConstants.MASS);
-let diff = new three_1.Vector3();
 init();
 animate();
 /**
@@ -122,7 +121,7 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
     let time = Date.now();
-    let windStrength = Math.cos(time / 2000) * 20 + 40;
+    let windStrength = Math.cos(time / 7000) * 20 + 40;
     windForce.set(Math.sin(time / 2000), Math.cos(time / 3000), Math.sin(time / 1000));
     windForce.normalize();
     windForce.multiplyScalar(windStrength);
@@ -132,11 +131,11 @@ function animate() {
 function render() {
     let p = cloth.particles;
     let clothGeoPosition = clothGeo.attributes.position;
-    for (let i = 0, il = p.length; i < il; i++) {
-        let v = p[i].position;
-        clothGeoPosition.setXYZ(i, v.x, v.y, v.z);
-    }
     if (!(clothGeoPosition instanceof three_1.InterleavedBufferAttribute)) {
+        for (let i = 0, il = p.length; i < il; i++) {
+            let v = p[i].position;
+            clothGeoPosition.setXYZ(i, v.x, v.y, v.z);
+        }
         clothGeoPosition.needsUpdate = true;
     }
     clothGeo.computeVertexNormals();
@@ -186,6 +185,7 @@ function simulate(time) {
     }
 }
 function satisfyConstraints(constraint) {
+    let diff = new three_1.Vector3();
     diff.subVectors(constraint.p1.position, constraint.p2.position);
     let currentDist = diff.length();
     if (currentDist === 0) {
