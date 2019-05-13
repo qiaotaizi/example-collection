@@ -1,11 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
+const initGLTFLoader = require("../../initGLTFLoader");
 const OrbitControls = require("three-orbitcontrols");
-require("three/examples/js/loaders/DRACOLoader");
-const GLTFLoader = require("three-gltf-loader");
-// require("three/examples/js/loaders/GLTFLoader");
-const initLoader = require("./initModelLoader");
 let clock;
 let mixer;
 let renderer;
@@ -44,7 +41,7 @@ function init() {
     //     ]);
     // THREE.DRACOLoader.setDecoderPath('js/libs/draco/gltf');
     // let loader:any=initLoader();
-    let loader = new GLTFLoader(new three_1.LoadingManager());
+    let loader = initGLTFLoader();
     loader.load("../assets/LittlestTokyo.glb", function (gltf) {
         //gltf类型为GLTF,但是无法导出
         let model = gltf.scene;

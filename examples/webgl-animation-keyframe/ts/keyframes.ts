@@ -7,12 +7,8 @@ import {
     Scene,
     WebGLRenderer
 } from "three";
+import initGLTFLoader = require("../../initGLTFLoader");
 const OrbitControls = require("three-orbitcontrols");
-import * as THREE from "three";
-require("three/examples/js/loaders/DRACOLoader");
-const GLTFLoader=require("three-gltf-loader");
-// require("three/examples/js/loaders/GLTFLoader");
-const initLoader=require("./initModelLoader");
 
 let clock: Clock;
 let mixer: AnimationMixer;
@@ -61,7 +57,7 @@ function init() {
     //     ]);
     // THREE.DRACOLoader.setDecoderPath('js/libs/draco/gltf');
     // let loader:any=initLoader();
-    let loader=new GLTFLoader(new LoadingManager());
+    let loader=initGLTFLoader();
     loader.load("../assets/LittlestTokyo.glb",function (gltf:any) {
         //gltf类型为GLTF,但是无法导出
         let model:Scene=gltf.scene;
@@ -72,7 +68,7 @@ function init() {
             if(childMesh.isMesh){
                 //childMesh.material.envMap=
             }
-        })
+        });
         scene.add(model);
         mixer=new AnimationMixer(model);
         mixer.clipAction(gltf.animations[0]).play();
