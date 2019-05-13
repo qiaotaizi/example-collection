@@ -10,6 +10,7 @@ import {
     WebGLRenderer
 } from "three";
 import initGLTFLoader = require("../../initGLTFLoader");
+import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
 
 let scene:Scene,renderer:WebGLRenderer,camera:PerspectiveCamera;
 let model:any,skeleton:SkeletonHelper,mixer:AnimationMixer,clock:Clock;
@@ -51,7 +52,7 @@ function init() {
     scene.add(groundMesh);
 
     let loader=initGLTFLoader();
-    loader.load("../assets/Soldier.glb",function (gltf) {
+    loader.load("../assets/Soldier.glb",function (gltf:GLTF) {
         model=gltf.scene;
         scene.add(model);
 
@@ -75,7 +76,7 @@ function init() {
         let runAction=mixer.clipAction(animations[1]);
 
         runAction.setEffectiveTimeScale(1);
-        runAction.setEffectiveWeight(0);
+        //runAction.setEffectiveWeight(0);
         runAction.enabled=true;
         runAction.play();
         //let actions=[idleAction,walkAction,runAction];
@@ -95,5 +96,7 @@ function init() {
 
 function animate() {
     requestAnimationFrame(animate);
+    let mixerUpdateDelta=clock.getDelta();
+    mixer.update(mixerUpdateDelta);
     renderer.render(scene,camera);
 }

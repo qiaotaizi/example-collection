@@ -1,8 +1,7 @@
-import GLTFLoader from "three-gltf-loader";
+const GLTFLoader=require("three-gltf-loader");
 
-
-function initGLTFLoader():GLTFLoader {
+function initGLTFLoader() {
     return new GLTFLoader();
 }
 
-export = initGLTFLoader;
+export =initGLTFLoader;

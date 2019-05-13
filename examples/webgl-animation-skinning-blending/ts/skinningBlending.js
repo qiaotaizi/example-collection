@@ -52,7 +52,7 @@ function init() {
         //let walkAction=mixer.clipAction(animations[3]);
         let runAction = mixer.clipAction(animations[1]);
         runAction.setEffectiveTimeScale(1);
-        runAction.setEffectiveWeight(0);
+        //runAction.setEffectiveWeight(0);
         runAction.enabled = true;
         runAction.play();
         //let actions=[idleAction,walkAction,runAction];
@@ -68,6 +68,8 @@ function init() {
 }
 function animate() {
     requestAnimationFrame(animate);
+    let mixerUpdateDelta = clock.getDelta();
+    mixer.update(mixerUpdateDelta);
     renderer.render(scene, camera);
 }
 //# sourceMappingURL=skinningBlending.js.map
