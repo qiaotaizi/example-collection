@@ -27,15 +27,20 @@ function init() {
     //camera
     camera = new three_1.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.set(1000, 50, 1500);
-    //lights TODO 好好看看这几个灯光类的api
+    // 环境光(AmbientLight)会均匀的照亮场景中的所有物体。
+    // 环境光不能用来投射阴影，因为它没有方向。
     scene.add(new three_1.AmbientLight(0x666666));
+    //平行光是沿着特定方向发射的光。这种光的表现像是无限远,从它发出的光线都是平行的。常常用平行光来模拟太阳光的效果;
+    //平行光可以投射阴影
     let light = new three_1.DirectionalLight(0xdfebff, 1);
     light.position.set(50, 200, 100);
     light.position.multiplyScalar(1.3);
-    light.castShadow = true;
+    light.castShadow = true; //如果设置为 true 该平行光会产生动态阴影
+    //light.shadow是一个DirectionalLightShadow对象
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.height = 1024;
     let d = 300;
+    //DirectionalLightShadow本质上是使用一个正交相机来计算阴影的
     light.shadow.camera.left = -d;
     light.shadow.camera.right = d;
     light.shadow.camera.top = d;
@@ -44,14 +49,16 @@ function init() {
     //添加草地
     let textureLoader = new three_1.TextureLoader();
     let groudTexture = textureLoader.load("../assets/grasslight-big.jpg");
-    // TODO texture相关api
-    groudTexture.wrapS = groudTexture.wrapT = three_1.RepeatWrapping;
-    groudTexture.repeat.set(25, 25);
-    groudTexture.anisotropy = 16;
-    // TODO MeshLambertMaterial api
+    //wrapS和wrapT分别对应uv映射的u和v
+    // TODO uv映射?
+    groudTexture.wrapS = groudTexture.wrapT = three_1.RepeatWrapping; //该常量设置纹理重复到无穷大
+    groudTexture.repeat.set(25, 25); //设置u,v方向上的贴图重复次数
+    groudTexture.anisotropy = 16; //沿着轴，通过具有最高纹素密度的像素的样本数,通常为2的幂
+    //MeshLambertMaterial:一种非光泽表面的材质，没有镜面高光。
     let groundMaterial = new three_1.MeshLambertMaterial({
-        map: groudTexture
+        map: groudTexture //颜色贴图
     });
+    //平面缓冲几何体
     let groundMesh = new three_1.Mesh(new three_1.PlaneBufferGeometry(20000, 20000), groundMaterial);
     groundMesh.position.y = -250;
     groundMesh.rotation.x = -Math.PI / 2; //转向90°
@@ -144,15 +151,8 @@ function render() {
 function rcShadow(mesh) {
     mesh.receiveShadow = mesh.castShadow = true;
 }
-//let lastTime:number;
-//let wind=true;
 function simulate(time) {
-    // if(!lastTime){
-    //     lastTime=time;
-    //     return;
-    // }
     let particles = cloth.particles;
-    // if(wind){
     let indx;
     let normal = new three_1.Vector3();
     let indices = clothGeo.index;
@@ -165,7 +165,6 @@ function simulate(time) {
             particles[indx].addForce(tmpForce);
         }
     }
-    // }
     for (let i = 0, il = particles.length; i < il; i++) {
         let particle = particles[i];
         particle.addForce(gravity);
