@@ -3,13 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <title>skinning blending</title>
-    <link type="text/css" rel="stylesheet" href="../../example.css" />
-    <link type="text/css" rel="stylesheet" href="../css/morphControl.css" />
+    <link type="text/css" rel="stylesheet" href="../../example.css"/>
+    <link type="text/css" rel="stylesheet" href="../css/morphControl.css"/>
 </head>
 <body>
 <div id="control_div">
-    <button id="test1_btn">test1</button>
-    <button id="test2_btn">test2</button>
+    <div>
+        <button id="idle_btn" class="control_btn">待机</button>
+        <button id="walk_btn" class="control_btn">行走</button>
+        <button id="dance_btn" class="control_btn">跳舞</button>
+        <button id="run_btn" class="control_btn">奔跑</button>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <td>
+                    愤怒
+                </td>
+                <td>
+                    悲伤
+                </td>
+                <td>
+                    惊讶
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <input id="angry_range" class="control_range" type="range" max="100" min="1" step="1" value="0"/>
+                </td>
+                <td>
+                    <input id="sad_range" class="control_range" type="range" max="100" min="1" step="1" value="0"/>
+                </td>
+                <td>
+                    <input id="surprise_range" class="control_range" type="range" max="100" min="1" step="1" value="0"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </div>
 <script>
     require("../../keyDown");
