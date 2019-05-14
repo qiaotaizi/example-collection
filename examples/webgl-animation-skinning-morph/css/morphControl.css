@@ -33,6 +33,15 @@
     margin-right: 5px;
 }
 
+.control_btn3{
+    width: 60px;
+    height: 60px;
+    border-radius: 60px;
+    background: rebeccapurple;
+    border: 0px;
+    margin-right: 5px;
+}
+
 .control_range{
     height: 5px;
     background: black;

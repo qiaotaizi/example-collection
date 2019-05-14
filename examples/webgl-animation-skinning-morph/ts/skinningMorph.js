@@ -48,7 +48,7 @@ function init() {
         animations = gltf.animations;
         activateAction = mixer.clipAction(animations[2]); //以idle状态初始化
         activateAction.play();
-        //scene.add(model);
+        scene.add(model);
     }, undefined, function (err) {
         console.error(err);
     });
@@ -113,7 +113,6 @@ function eventBinding() {
     bindActionBtn("walk_btn", 10); //Walking
     bindActionBtn("dance_btn", 0); //Dance
     bindActionBtn("run_btn", 6); //Running
-    bindActionBtn("death_btn", 1); //Death
     /**
      * 绑定情绪类动作按钮
      * 这类动作在完成之后恢复原状态
@@ -124,13 +123,19 @@ function eventBinding() {
         let btn = document.getElementById(btnId);
         if (btn) {
             btn.addEventListener("click", function (event) {
-                fadeToAction(mixer.clipAction(animations[animationIndex]), 0.2);
-                function restoreState() {
-                    mixer.removeEventListener('finished', restoreState);
-                    fadeToAction(previousAction, 0.2);
-                }
+                let anim = mixer.clipAction(animations[animationIndex]);
+                anim.setLoop(three_1.LoopOnce, 1);
+                fadeToAction(anim, 0.2);
+                // function restoreState(){
+                //     mixer.removeEventListener('finished',restoreState);
+                //     fadeToAction(previousAction,0.2);
+                // }
                 //完成动作后返回原状态
-                mixer.addEventListener('finished', restoreState);
+                mixer.addEventListener('finished', function () {
+                    console.log("播放结束");
+                    activateAction = previousAction;
+                    activateAction.play();
+                });
             });
         }
     }
@@ -142,40 +147,31 @@ function eventBinding() {
     bindEmoteBtn("wave_btn", 12); //Wave
     bindEmoteBtn("punch_btn", 5); //Punch
     bindEmoteBtn("thumbsup_btn", 9); //ThumbsUp
-    /**
-     * 绑定面部表情
-     * @param btnId
-     * @param animationIndex
-     */
-    function bindFaceBtn(btnId, animationIndex) {
-    }
+    bindEmoteBtn("death_btn", 1); //Death
+    bindEmoteBtn("walkjump_btn", 11); //walkjump
 }
+/**
+ * 绑定面部表情控制
+ * @param face
+ */
 function bindFace(face) {
-    //获取所有morphTargets
-    let morphOk = face.morphTargetDictionary && face.morphTargetInfluences;
-    if (face.morphTargetDictionary) {
-        let dict = Object.keys(face.morphTargetDictionary);
-        for (let i = 0; i < dict.length; i++) {
-            console.log("key=" + dict[i] + ";value=" + face.morphTargetDictionary[dict[i]]);
+    function bindFaceRange(morphTargetInfluences, index, rangeId) {
+        let range = document.getElementById(rangeId);
+        if (range) {
+            range.addEventListener("change", function (event) {
+                let input = this;
+                morphTargetInfluences[index] = input.valueAsNumber;
+            });
         }
     }
-    let angryRange = document.getElementById("angry_range");
-    if (angryRange) {
-        angryRange.addEventListener("change", function (event) {
-            let input = this;
-        });
+    if (face.morphTargetInfluences) {
+        bindFaceRange(face.morphTargetInfluences, 0, "angry_range"); //Angry
+        bindFaceRange(face.morphTargetInfluences, 1, "surprise_range"); //Surprised
+        bindFaceRange(face.morphTargetInfluences, 2, "sad_range"); //Sad
     }
-    let sadRange = document.getElementById("sad_range");
-    if (sadRange) {
-        sadRange.addEventListener("change", function (event) {
-            let input = this;
-        });
-    }
-    let surpriseRange = document.getElementById("surprise_range");
-    if (surpriseRange) {
-        surpriseRange.addEventListener("change", function (event) {
-            let input = this;
-        });
+    else {
+        console.log("morph target not ok");
+        return;
     }
 }
 //# sourceMappingURL=skinningMorph.js.map

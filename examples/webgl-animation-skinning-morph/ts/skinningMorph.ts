@@ -4,7 +4,7 @@ import {
     Clock,
     Color,
     DirectionalLight,
-    Fog, GridHelper, Material, Mesh, MeshPhongMaterial, Object3D,
+    Fog, GridHelper, LoopOnce, LoopPingPong, Material, Mesh, MeshPhongMaterial, Object3D,
     PerspectiveCamera, PlaneBufferGeometry,
     Scene,
     Vector3,
@@ -147,7 +147,6 @@ function eventBinding() {
     bindActionBtn("walk_btn",10);//Walking
     bindActionBtn("dance_btn",0);//Dance
     bindActionBtn("run_btn",6);//Running
-    bindActionBtn("death_btn",1);//Death
 
     /**
      * 绑定情绪类动作按钮
@@ -159,13 +158,13 @@ function eventBinding() {
         let btn = document.getElementById(btnId);
         if (btn) {
             btn.addEventListener("click", function (event) {
-                fadeToAction(mixer.clipAction(animations[animationIndex]),0.2);
-                function restoreState(){
-                    mixer.removeEventListener('finished',restoreState);
-                    fadeToAction(previousAction,0.2);
-                }
+                let anim=mixer.clipAction(animations[animationIndex]);
+                anim.setLoop(LoopOnce,1);
+                fadeToAction(anim,0.2);
                 //完成动作后返回原状态
-                mixer.addEventListener('finished',restoreState);
+                mixer.addEventListener('finished',function () {
+                    console.log("播放结束");
+                });
             })
         }
     }
@@ -178,6 +177,8 @@ function eventBinding() {
     bindEmoteBtn("wave_btn",12);//Wave
     bindEmoteBtn("punch_btn",5);//Punch
     bindEmoteBtn("thumbsup_btn",9);//ThumbsUp
+    bindEmoteBtn("death_btn",1);//Death
+    bindEmoteBtn("walkjump_btn",11);//walkjump
 }
 
 /**
