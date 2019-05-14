@@ -146,18 +146,36 @@ function eventBinding() {
     bindActionBtn("dance_btn",0);//Dance
     bindActionBtn("run_btn",6);//Running
     bindActionBtn("death_btn",1);//Death
-    bindActionBtn("sit_btn",7);//Sitting
-    bindActionBtn("standing_btn",8);//Standing
-    bindActionBtn("walkjump_btn",11);//WalkJump
 
     /**
      * 绑定情绪类动作按钮
+     * 这类动作在完成之后恢复原状态
      * @param btnId
      * @param animationIndex
      */
     function bindEmoteBtn(btnId:string,animationIndex:number){
-
+        let btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener("click", function (event) {
+                fadeToAction(mixer.clipAction(animations[animationIndex]),0.2);
+                function restoreState(){
+                    mixer.removeEventListener('finished',restoreState);
+                    fadeToAction(previousAction,0.2);
+                }
+                //完成动作后返回原状态
+                mixer.addEventListener('finished',restoreState);
+            })
+        }
     }
+
+    bindEmoteBtn("sit_btn",7);//Sitting
+    bindEmoteBtn("standing_btn",8);//Standing
+    bindEmoteBtn("jump_btn",3);//Jump
+    bindEmoteBtn("yes_btn",13);//Yes
+    bindEmoteBtn("no_btn",4);//No
+    bindEmoteBtn("wave_btn",12);//Wave
+    bindEmoteBtn("punch_btn",5);//Punch
+    bindEmoteBtn("thumbsup_btn",9);//ThumbsUp
 
     /**
      * 绑定面部表情
