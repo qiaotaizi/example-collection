@@ -68,23 +68,6 @@ function init() {
     loader.load("../assets/RobotExpressive.glb", function (gltf: GLTF) {
         model = gltf.scene;
         mixer = new AnimationMixer(model);
-        //打印所有动画片段
-        /**
-         * 0 : Dance
-         * 1 : Death
-         * 2 : Idle
-         * 3 : Jump
-         * 4 : No
-         * 5 : Punch
-         * 6 : Running
-         * 7 : Sitting
-         * 8 : Standing
-         * 9 : ThumbsUp
-         * 10 : Walking
-         * 11 : WalkJump
-         * 12 : Wave
-         * 13 : Yes
-         */
         animations=gltf.animations;
         activateAction = mixer.clipAction(animations[2]);//以idle状态初始化
         activateAction.play();
@@ -121,41 +104,51 @@ function fadeToAction(action: AnimationAction, duration: number) {
     }
 }
 
+
 /**
- * 绑定控制按钮点击事件
+ * 所有动画片段
+ * 0 : Dance
+ * 1 : Death
+ * 2 : Idle
+ * 3 : Jump
+ * 4 : No
+ * 5 : Punch
+ * 6 : Running
+ * 7 : Sitting
+ * 8 : Standing
+ * 9 : ThumbsUp
+ * 10 : Walking
+ * 11 : WalkJump
+ * 12 : Wave
+ * 13 : Yes
+ */
+
+
+/**
+ * 绑定控制按钮事件
  */
 function eventBinding() {
-    let idleBtn = document.getElementById("idle_btn");
-    if (idleBtn) {
-        idleBtn.addEventListener("click", function (event) {
-            console.log("进入待机状态");
-            fadeToAction(mixer.clipAction(animations[2]),0.5);
-        })
+    /**
+     * 绑定状态按钮
+     * @param btnId
+     * @param animationIndex
+     */
+    function bindActionBtn(btnId: string, animationIndex: number) {
+        let btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener("click", function (event) {
+                fadeToAction(mixer.clipAction(animations[animationIndex]),0.5);
+            })
+        }
     }
-
-    let walkBtn = document.getElementById("walk_btn");
-    if (walkBtn) {
-        walkBtn.addEventListener("click", function (event) {
-            console.log("进入行走状态");
-            fadeToAction(mixer.clipAction(animations[10]),0.5);
-        })
-    }
-
-    let danceBtn = document.getElementById("dance_btn");
-    if (danceBtn) {
-        danceBtn.addEventListener("click", function (event) {
-            console.log("进入跳舞状态");
-            fadeToAction(mixer.clipAction(animations[0]),0.5);
-        })
-    }
-
-    let runBtn = document.getElementById("run_btn");
-    if (runBtn) {
-        runBtn.addEventListener("click", function (event) {
-            console.log("进入奔跑状态");
-            fadeToAction(mixer.clipAction(animations[6]),0.5);
-        })
-    }
+    bindActionBtn("idle_btn",2);//Idle
+    bindActionBtn("walk_btn",10);//Walking
+    bindActionBtn("dance_btn",0);//Dance
+    bindActionBtn("run_btn",6);//Running
+    bindActionBtn("death_btn",1);//Death
+    bindActionBtn("sit_btn",7);//Sitting
+    bindActionBtn("standing_btn",8);//Standing
+    bindActionBtn("walkjump_btn",11);//WalkJump
 
     let angryRange = document.getElementById("angry_range");
     if (angryRange) {
