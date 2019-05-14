@@ -125,30 +125,46 @@ function eventBinding() {
             btn.addEventListener("click", function (event) {
                 let anim = mixer.clipAction(animations[animationIndex]);
                 anim.setLoop(three_1.LoopOnce, 1);
+                anim.clampWhenFinished = true;
                 fadeToAction(anim, 0.2);
-                // function restoreState(){
-                //     mixer.removeEventListener('finished',restoreState);
-                //     fadeToAction(previousAction,0.2);
-                // }
                 //完成动作后返回原状态
                 mixer.addEventListener('finished', function () {
-                    console.log("播放结束");
-                    activateAction = previousAction;
-                    activateAction.play();
+                    console.log("播放结束,恢复原状态");
                 });
             });
         }
     }
-    bindEmoteBtn("sit_btn", 7); //Sitting
-    bindEmoteBtn("standing_btn", 8); //Standing
     bindEmoteBtn("jump_btn", 3); //Jump
     bindEmoteBtn("yes_btn", 13); //Yes
     bindEmoteBtn("no_btn", 4); //No
     bindEmoteBtn("wave_btn", 12); //Wave
     bindEmoteBtn("punch_btn", 5); //Punch
     bindEmoteBtn("thumbsup_btn", 9); //ThumbsUp
-    bindEmoteBtn("death_btn", 1); //Death
     bindEmoteBtn("walkjump_btn", 11); //walkjump
+    /**
+     * 绑定一次性动作
+     * 完成后暂停
+     * @param btnId
+     * @param animationIndex
+     */
+    function bindOnceBtn(btnId, animationIndex) {
+        let btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener("click", function (event) {
+                let anim = mixer.clipAction(animations[animationIndex]);
+                anim.setLoop(three_1.LoopOnce, 1);
+                anim.clampWhenFinished = true;
+                fadeToAction(anim, 0.2);
+                //完成动作后返回原状态
+                mixer.addEventListener('finished', function () {
+                    console.log("播放结束");
+                });
+            });
+        }
+    }
+    bindOnceBtn("sit_btn", 7); //Sitting
+    bindOnceBtn("standing_btn", 8); //Standing
+    bindOnceBtn("death_btn", 1); //Death
 }
 /**
  * 绑定面部表情控制
@@ -158,7 +174,7 @@ function bindFace(face) {
     function bindFaceRange(morphTargetInfluences, index, rangeId) {
         let range = document.getElementById(rangeId);
         if (range) {
-            range.addEventListener("change", function (event) {
+            range.addEventListener("touchmove", function (event) {
                 let input = this;
                 morphTargetInfluences[index] = input.valueAsNumber;
             });
