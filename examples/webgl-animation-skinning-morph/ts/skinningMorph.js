@@ -174,7 +174,7 @@ function bindFace(face) {
     function bindFaceRange(morphTargetInfluences, index, rangeId) {
         let range = document.getElementById(rangeId);
         if (range) {
-            range.addEventListener("touchmove", function (event) {
+            range.addEventListener("change", function (event) {
                 let input = this;
                 morphTargetInfluences[index] = input.valueAsNumber;
             });
