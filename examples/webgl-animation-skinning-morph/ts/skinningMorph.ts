@@ -4,7 +4,7 @@ import {
     Clock,
     Color,
     DirectionalLight,
-    Fog, GridHelper, Material, Mesh, MeshPhongMaterial,
+    Fog, GridHelper, Material, Mesh, MeshPhongMaterial, Object3D,
     PerspectiveCamera, PlaneBufferGeometry,
     Scene,
     Vector3,
@@ -16,8 +16,6 @@ import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
 let camera: PerspectiveCamera, scene: Scene, clock: Clock, mixer: AnimationMixer;
 
 let renderer: WebGLRenderer;
-
-let model: Scene;
 
 let activateAction: AnimationAction, previousAction: AnimationAction;
 
@@ -66,7 +64,11 @@ function init() {
     //model
     let loader = initGLTFLoader();
     loader.load("../assets/RobotExpressive.glb", function (gltf: GLTF) {
-        model = gltf.scene;
+        let model = gltf.scene;
+        let face_=model.getObjectByName("Head_2");
+        if(face_ && face_ instanceof Mesh){
+            bindFace(face_);
+        }
         mixer = new AnimationMixer(model);
         animations=gltf.animations;
         activateAction = mixer.clipAction(animations[2]);//以idle状态初始化
@@ -176,37 +178,29 @@ function eventBinding() {
     bindEmoteBtn("wave_btn",12);//Wave
     bindEmoteBtn("punch_btn",5);//Punch
     bindEmoteBtn("thumbsup_btn",9);//ThumbsUp
+}
 
-    /**
-     * 绑定面部表情
-     * @param btnId
-     * @param animationIndex
-     */
-    function bindFaceBtn(btnId:string,animationIndex:number){
-
+/**
+ * 绑定面部表情控制
+ * @param face
+ */
+function bindFace(face:Mesh) {
+    function bindFaceRange(morphTargetInfluences: number[], index: number,rangeId:string) {
+        let range=document.getElementById(rangeId);
+        if(range){
+            range.addEventListener("change", function (this, event) {
+                let input = this as HTMLInputElement;
+                morphTargetInfluences[index]=input.valueAsNumber;
+            });
+        }
     }
 
-    let angryRange = document.getElementById("angry_range");
-    if (angryRange) {
-        angryRange.addEventListener("change", function (this, event) {
-            let input = this as HTMLInputElement;
-            console.log("愤怒=" + input.value);
-        })
-    }
-
-    let sadRange = document.getElementById("sad_range");
-    if (sadRange) {
-        sadRange.addEventListener("change", function (this, event) {
-            let input = this as HTMLInputElement;
-            console.log("悲伤=" + input.value);
-        })
-    }
-
-    let surpriseRange = document.getElementById("surprise_range");
-    if (surpriseRange) {
-        surpriseRange.addEventListener("change", function (this, event) {
-            let input = this as HTMLInputElement;
-            console.log("惊讶=" + input.value);
-        })
+    if(face.morphTargetInfluences){
+        bindFaceRange(face.morphTargetInfluences,0,"angry_range");//Angry
+        bindFaceRange(face.morphTargetInfluences,1,"surprise_range");//Surprised
+        bindFaceRange(face.morphTargetInfluences,2,"sad_range");//Sad
+    }else{
+        console.log("morph target not ok");
+        return;
     }
 }

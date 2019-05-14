@@ -4,7 +4,6 @@ const three_1 = require("three");
 const initGLTFLoader = require("../../initGLTFLoader");
 let camera, scene, clock, mixer;
 let renderer;
-let model;
 let activateAction, previousAction;
 let animations;
 init();
@@ -40,12 +39,16 @@ function init() {
     //model
     let loader = initGLTFLoader();
     loader.load("../assets/RobotExpressive.glb", function (gltf) {
-        model = gltf.scene;
+        let model = gltf.scene;
+        let face_ = model.getObjectByName("Head_2");
+        if (face_ && face_ instanceof three_1.Mesh) {
+            bindFace(face_);
+        }
         mixer = new three_1.AnimationMixer(model);
         animations = gltf.animations;
         activateAction = mixer.clipAction(animations[2]); //以idle状态初始化
         activateAction.play();
-        scene.add(model);
+        //scene.add(model);
     }, undefined, function (err) {
         console.error(err);
     });
@@ -94,7 +97,7 @@ function fadeToAction(action, duration) {
  */
 function eventBinding() {
     /**
-     * 绑定状态按钮
+     * 绑定状态类动作按钮
      * @param btnId
      * @param animationIndex
      */
@@ -111,28 +114,67 @@ function eventBinding() {
     bindActionBtn("dance_btn", 0); //Dance
     bindActionBtn("run_btn", 6); //Running
     bindActionBtn("death_btn", 1); //Death
-    bindActionBtn("sit_btn", 7); //Sitting
-    bindActionBtn("standing_btn", 8); //Standing
-    bindActionBtn("walkjump_btn", 11); //WalkJump
+    /**
+     * 绑定情绪类动作按钮
+     * 这类动作在完成之后恢复原状态
+     * @param btnId
+     * @param animationIndex
+     */
+    function bindEmoteBtn(btnId, animationIndex) {
+        let btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener("click", function (event) {
+                fadeToAction(mixer.clipAction(animations[animationIndex]), 0.2);
+                function restoreState() {
+                    mixer.removeEventListener('finished', restoreState);
+                    fadeToAction(previousAction, 0.2);
+                }
+                //完成动作后返回原状态
+                mixer.addEventListener('finished', restoreState);
+            });
+        }
+    }
+    bindEmoteBtn("sit_btn", 7); //Sitting
+    bindEmoteBtn("standing_btn", 8); //Standing
+    bindEmoteBtn("jump_btn", 3); //Jump
+    bindEmoteBtn("yes_btn", 13); //Yes
+    bindEmoteBtn("no_btn", 4); //No
+    bindEmoteBtn("wave_btn", 12); //Wave
+    bindEmoteBtn("punch_btn", 5); //Punch
+    bindEmoteBtn("thumbsup_btn", 9); //ThumbsUp
+    /**
+     * 绑定面部表情
+     * @param btnId
+     * @param animationIndex
+     */
+    function bindFaceBtn(btnId, animationIndex) {
+    }
+}
+function bindFace(face) {
+    //获取所有morphTargets
+    let morphOk = face.morphTargetDictionary && face.morphTargetInfluences;
+    if (face.morphTargetDictionary) {
+        let dict = Object.keys(face.morphTargetDictionary);
+        for (let i = 0; i < dict.length; i++) {
+            console.log("key=" + dict[i] + ";value=" + face.morphTargetDictionary[dict[i]]);
+        }
+    }
     let angryRange = document.getElementById("angry_range");
     if (angryRange) {
         angryRange.addEventListener("change", function (event) {
             let input = this;
-            console.log("愤怒=" + input.value);
         });
     }
     let sadRange = document.getElementById("sad_range");
     if (sadRange) {
         sadRange.addEventListener("change", function (event) {
             let input = this;
-            console.log("悲伤=" + input.value);
         });
     }
     let surpriseRange = document.getElementById("surprise_range");
     if (surpriseRange) {
         surpriseRange.addEventListener("change", function (event) {
             let input = this;
-            console.log("惊讶=" + input.value);
         });
     }
 }
