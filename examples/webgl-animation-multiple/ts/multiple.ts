@@ -121,15 +121,15 @@ function loadModels() {
     });
 
     //载入鹦鹉对象
-    loader.load(parrotModelPosition, function (gltf: GLTF) {
-        let gltfScene=gltf.scene;
-        gltfScene.traverse(function (object: Object3D) {
-            if (object instanceof Mesh) {
-                object.castShadow = true;
-            }
-        });
-        cloneAndAddModels(gltf,parrotUnits);
-    });
+    // loader.load(parrotModelPosition, function (gltf: GLTF) {
+    //     let gltfScene=gltf.scene;
+    //     gltfScene.traverse(function (object: Object3D) {
+    //         if (object instanceof Mesh) {
+    //             object.castShadow = true;
+    //         }
+    //     });
+    //     cloneAndAddModels(gltf,parrotUnits);
+    // });
 }
 
 /**
@@ -140,19 +140,21 @@ function loadModels() {
 function cloneAndAddModels(gltf: GLTF, units: RenderUnit[]) {
     for(let i=0;i<units.length;i++){
         let u=units[i];
-        let skeleton=new SkeletonHelper(gltf.scene);
-        let clonedScene=skeleton.clone();
+        let model=gltf.scene;
+        let clonedScene=model.clone();
         if(clonedScene){
             clonedScene.scale.set(u.scale,u.scale,u.scale);
+            console.log(u.scale);
             clonedScene.position.set(u.position.x,u.position.y,u.position.z);
             clonedScene.rotation.set(u.rotation.x,u.rotation.y,u.rotation.z);
             let clonedMesh=clonedScene.getObjectByName(u.meshName);
             if(clonedMesh){
-                let mixer=new AnimationMixer(clonedMesh);
+                let mixer=new AnimationMixer(clonedScene);
                 if(u.animationName){
                     let clip=AnimationClip.findByName(gltf.animations,u.animationName);
                     if(clip){
                         let action=mixer.clipAction(clip);
+                        console.log("playing clip "+u.animationName);
                         action.play();
                     }
                 }
@@ -166,9 +168,8 @@ function cloneAndAddModels(gltf: GLTF, units: RenderUnit[]) {
 function animate() {
     requestAnimationFrame(animate);
     let dt=clock.getDelta();
-    console.log(mixers.length);
-    // for(let i=0;i<mixers.length;i++){
-    //     mixers[i].update(dt);
-    // }
+    for(let i=0;i<mixers.length;i++){
+        mixers[i].update(dt);
+    }
     renderer.render(scene, camera);
 }

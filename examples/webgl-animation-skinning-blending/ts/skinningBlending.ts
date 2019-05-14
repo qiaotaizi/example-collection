@@ -64,7 +64,7 @@ function init() {
         });
 
         skeleton=new SkeletonHelper(model);
-        skeleton.visible=false;
+        skeleton.visible=true;
         scene.add(skeleton);
 
         let animations=gltf.animations;
