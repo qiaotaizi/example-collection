@@ -129,7 +129,7 @@ function fadeToAction(action: AnimationAction, duration: number) {
  */
 function eventBinding() {
     /**
-     * 绑定状态按钮
+     * 绑定状态类动作按钮
      * @param btnId
      * @param animationIndex
      */
@@ -149,6 +149,24 @@ function eventBinding() {
     bindActionBtn("sit_btn",7);//Sitting
     bindActionBtn("standing_btn",8);//Standing
     bindActionBtn("walkjump_btn",11);//WalkJump
+
+    /**
+     * 绑定情绪类动作按钮
+     * @param btnId
+     * @param animationIndex
+     */
+    function bindEmoteBtn(btnId:string,animationIndex:number){
+
+    }
+
+    /**
+     * 绑定面部表情
+     * @param btnId
+     * @param animationIndex
+     */
+    function bindFaceBtn(btnId:string,animationIndex:number){
+
+    }
 
     let angryRange = document.getElementById("angry_range");
     if (angryRange) {
