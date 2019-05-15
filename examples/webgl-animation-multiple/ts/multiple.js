@@ -84,10 +84,10 @@ function loadModels() {
  * @param soldierUnits
  */
 function cloneAndAddModels(gltf, units) {
+    let model = gltf.scene;
     for (let i = 0; i < units.length; i++) {
         let u = units[i];
-        let model = gltf.scene;
-        let clonedScene = model.clone();
+        let clonedScene = model.copy(model);
         if (clonedScene) {
             clonedScene.scale.set(u.scale, u.scale, u.scale);
             console.log(u.scale);

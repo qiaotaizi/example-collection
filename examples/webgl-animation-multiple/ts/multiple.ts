@@ -7,7 +7,7 @@ import {
     Fog,
     HemisphereLight, Mesh, MeshPhongMaterial, Object3D, PCFSoftShadowMap,
     PerspectiveCamera, PlaneBufferGeometry,
-    Scene, SceneUtils, SkeletonHelper, Vector3,
+    Scene, SceneUtils, Skeleton, SkeletonHelper, Vector3,
     WebGLRenderer
 } from "three";
 import {RenderUnit} from "./multipleC";
@@ -138,11 +138,13 @@ function loadModels() {
  * @param soldierUnits
  */
 function cloneAndAddModels(gltf: GLTF, units: RenderUnit[]) {
+    console.log("ok");
+    let model=gltf.scene;
     for(let i=0;i<units.length;i++){
         let u=units[i];
-        let model=gltf.scene;
-        let clonedScene=model.clone();
+        let clonedScene=model.copy(model);
         if(clonedScene){
+            console.log("clone scene ok");
             clonedScene.scale.set(u.scale,u.scale,u.scale);
             console.log(u.scale);
             clonedScene.position.set(u.position.x,u.position.y,u.position.z);

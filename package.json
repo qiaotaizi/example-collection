@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "package": "electron-packager ./ example-collection --platform=win32 --arch=x64 --out ../../electronOutput --electron-version 5.0.1 --overwrite"
+    "package": "electron-packager ./ example-collection --platform=win32 --arch=x64 --out ../../electronOutput --electron-version 5.0.1 --overwrite",
+    "dist-win": "electron-builder --win --x64"
   },
   "author": "Jaiz",
   "license": "BSD-2-Clause",
@@ -16,5 +17,18 @@
     "three": "^0.104.0",
     "three-gltf-loader": "^1.104.0",
     "three-orbitcontrols": "^2.102.1"
+  },
+  "build": {
+    "appId": "com.jaiz.study.example.collection",
+    "directories": {
+      "output": "../../electronOutput"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
