@@ -33,8 +33,9 @@ let viewPortWidth:number,viewPortHeight:number;
  */
 let activateState:number=0;
 
-
 init();
+
+bindEvent();
 
 animate();
 
@@ -50,12 +51,13 @@ function init() {
 
     perspectiveCamera=new PerspectiveCamera(50,0.5*aspect,150,10000);
     perspectiveCameraHelper=new CameraHelper(perspectiveCamera);
+    perspectiveCameraHelper.visible=true;
     scene=new Scene();
     scene.add(perspectiveCameraHelper);
 
     orthographicCamera=new OrthographicCamera(0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000);
     orthographicCameraHelper=new CameraHelper(orthographicCamera);
-
+    orthographicCameraHelper.visible=false;
     scene.add(orthographicCameraHelper);
 
     // activateCamera=perspectiveCamera;
@@ -144,10 +146,6 @@ function render() {
         perspectiveCamera.updateProjectionMatrix();
 
         perspectiveCameraHelper.update();
-
-        //可见性可以挪出来
-        perspectiveCameraHelper.visible=true;
-        orthographicCameraHelper.visible=false;
     }else{
         //正交
         helper=orthographicCameraHelper;
@@ -156,10 +154,6 @@ function render() {
         orthographicCamera.updateProjectionMatrix();
 
         orthographicCameraHelper.update();
-
-
-        perspectiveCameraHelper.visible=false;
-        orthographicCameraHelper.visible=true;
     }
 
     cameraRig.lookAt(mesh1.position);
@@ -178,4 +172,17 @@ function render() {
 function animate() {
     requestAnimationFrame(animate);
     render();
+}
+
+/**
+ * 绑定点击事件
+ */
+function bindEvent() {
+    let btn=document.getElementById("toggle-camera") as HTMLButtonElement;
+    btn.addEventListener("click",function (event) {
+        activateState=1-activateState;
+        //可见性可以挪出来
+        perspectiveCameraHelper.visible=!perspectiveCameraHelper.visible;
+        orthographicCameraHelper.visible=!orthographicCameraHelper.visible;
+    })
 }

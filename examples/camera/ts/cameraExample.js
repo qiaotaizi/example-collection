@@ -15,6 +15,7 @@ let viewPortWidth, viewPortHeight;
  */
 let activateState = 0;
 init();
+bindEvent();
 animate();
 function init() {
     sceneWidth = window.innerWidth;
@@ -27,10 +28,12 @@ function init() {
     camera.position.z = 2500;
     perspectiveCamera = new three_1.PerspectiveCamera(50, 0.5 * aspect, 150, 10000);
     perspectiveCameraHelper = new three_1.CameraHelper(perspectiveCamera);
+    perspectiveCameraHelper.visible = true;
     scene = new three_1.Scene();
     scene.add(perspectiveCameraHelper);
     orthographicCamera = new three_1.OrthographicCamera(0.5 * frustumSize * aspect / -2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / -2, 150, 1000);
     orthographicCameraHelper = new three_1.CameraHelper(orthographicCamera);
+    orthographicCameraHelper.visible = false;
     scene.add(orthographicCameraHelper);
     // activateCamera=perspectiveCamera;
     // activateCameraHelper=perspectiveCameraHelper;
@@ -90,9 +93,6 @@ function render() {
         perspectiveCamera.far = mesh1.position.length();
         perspectiveCamera.updateProjectionMatrix();
         perspectiveCameraHelper.update();
-        //可见性可以挪出来
-        perspectiveCameraHelper.visible = true;
-        orthographicCameraHelper.visible = false;
     }
     else {
         //正交
@@ -101,8 +101,6 @@ function render() {
         orthographicCamera.far = mesh1.position.length();
         orthographicCamera.updateProjectionMatrix();
         orthographicCameraHelper.update();
-        perspectiveCameraHelper.visible = false;
-        orthographicCameraHelper.visible = true;
     }
     cameraRig.lookAt(mesh1.position);
     renderer.clear();
@@ -118,5 +116,17 @@ function render() {
 function animate() {
     requestAnimationFrame(animate);
     render();
+}
+/**
+ * 绑定点击事件
+ */
+function bindEvent() {
+    let btn = document.getElementById("toggle-camera");
+    btn.addEventListener("click", function (event) {
+        activateState = 1 - activateState;
+        //可见性可以挪出来
+        perspectiveCameraHelper.visible = !perspectiveCameraHelper.visible;
+        orthographicCameraHelper.visible = !orthographicCameraHelper.visible;
+    });
 }
 //# sourceMappingURL=cameraExample.js.map
