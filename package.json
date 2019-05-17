@@ -4,6 +4,8 @@
   "description": "three.js例子集",
   "main": "index.js",
   "scripts": {
+    "test": "node test.js",
+    "test2": "node test2.ts",
     "start": "electron .",
     "package": "electron-packager ./ example-collection --platform=win32 --arch=x64 --out ../../electronOutput --electron-version 5.0.1 --overwrite",
     "dist-win": "electron-builder --win --x64"
