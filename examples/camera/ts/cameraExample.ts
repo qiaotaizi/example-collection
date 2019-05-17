@@ -22,6 +22,8 @@ let perspectiveCameraHelper:CameraHelper,orthographicCameraHelper:CameraHelper;
 
 let cameraRig:Group;
 
+let mesh1:Mesh;
+
 
 
 init();
@@ -56,7 +58,7 @@ function init() {
 
     scene.add(cameraRig);
 
-    let mesh1=new Mesh(
+    mesh1=new Mesh(
         new SphereBufferGeometry(100,16,8),
         new MeshBasicMaterial({color:0xffffff,wireframe:true})
     );
@@ -107,7 +109,14 @@ function init() {
 
 function render() {
 
+    cameraRig.lookAt(mesh1.position);
+    renderer.clear();
+    activateCameraHelper.visible=false;
+    renderer.setViewport(0,0,window.innerWidth*0.5,window.innerHeight);//实现分屏
+    renderer.render(scene,activateCamera);
 
+    activateCameraHelper.visible=true;
+    renderer.setViewport(window.innerWidth*0.5,0,window.innerWidth*0.5,window.innerHeight);
     renderer.render(scene,camera);
 }
 

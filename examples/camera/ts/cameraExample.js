@@ -7,6 +7,7 @@ let activateCamera, activateCameraHelper;
 let perspectiveCamera, orthographicCamera;
 let perspectiveCameraHelper, orthographicCameraHelper;
 let cameraRig;
+let mesh1;
 init();
 animate();
 function init() {
@@ -29,7 +30,7 @@ function init() {
     cameraRig.add(perspectiveCamera);
     cameraRig.add(orthographicCamera);
     scene.add(cameraRig);
-    let mesh1 = new three_1.Mesh(new three_1.SphereBufferGeometry(100, 16, 8), new three_1.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
+    mesh1 = new three_1.Mesh(new three_1.SphereBufferGeometry(100, 16, 8), new three_1.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
     let mesh2 = new three_1.Mesh(new three_1.SphereBufferGeometry(50, 16, 8), new three_1.MeshBasicMaterial({ color: 0x00ff00, wireframe: true }));
     mesh2.position.y = 150;
     let mesh3 = new three_1.Mesh(new three_1.SphereBufferGeometry(5, 16, 8), new three_1.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }));
@@ -57,6 +58,13 @@ function init() {
     document.body.appendChild(renderer.domElement);
 }
 function render() {
+    cameraRig.lookAt(mesh1.position);
+    renderer.clear();
+    activateCameraHelper.visible = false;
+    renderer.setViewport(0, 0, window.innerWidth * 0.5, window.innerHeight); //实现分屏
+    renderer.render(scene, activateCamera);
+    activateCameraHelper.visible = true;
+    renderer.setViewport(window.innerWidth * 0.5, 0, window.innerWidth * 0.5, window.innerHeight);
     renderer.render(scene, camera);
 }
 function animate() {
