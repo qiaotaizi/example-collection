@@ -10,9 +10,7 @@ import {
     SphereBufferGeometry,
     WebGLRenderer
 } from "three";
-import {MathUtils} from "three/examples/jsm/utils/MathUtils";
-import {_Math} from "three/src/math/Math";
-import randFloatSpread = _Math.randFloatSpread;
+import {randFloatSpread2} from "../../utils";
 
 let camera:PerspectiveCamera,scene:Scene,renderer:WebGLRenderer;
 
@@ -38,7 +36,7 @@ function init() {
 
     perspectiveCamera=new PerspectiveCamera(50,0.5*aspect,150,10000);
     perspectiveCameraHelper=new CameraHelper(perspectiveCamera);
-
+    scene=new Scene();
     scene.add(perspectiveCameraHelper);
 
     orthographicCamera=new OrthographicCamera(0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000);
@@ -86,9 +84,10 @@ function init() {
     //星星
     for(let i=0;i<10000;i++){
         //Random float from <-range/2, range/2> interval
-        vertivles.push(randFloatSpread(2000));
-        vertivles.push(randFloatSpread(2000));
-        vertivles.push(randFloatSpread(2000));
+        //_Math.randFloatSpread 无法调用 这里重新声明一次
+        vertivles.push(randFloatSpread2(2000));
+        vertivles.push(randFloatSpread2(2000));
+        vertivles.push(randFloatSpread2(2000));
     }
 
     geometry.addAttribute('position',new Float32BufferAttribute(vertivles,3));
