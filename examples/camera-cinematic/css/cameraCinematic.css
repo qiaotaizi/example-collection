@@ -1,0 +1,13 @@
+canvas{
+    position: absolute;
+    z-index: 0;
+    display: block;
+}
+
+#toggle-camera-cinematic{
+    float: left;
+    position: relative;
+    z-index: 1;
+    background-color: black;
+}
+

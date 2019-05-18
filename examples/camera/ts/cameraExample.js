@@ -121,7 +121,7 @@ function animate() {
  * 绑定点击事件
  */
 function bindEvent() {
-    let btn = document.getElementById("toggle-camera");
+    let btn = document.getElementById("toggle-camera-btn");
     btn.addEventListener("click", function (event) {
         activateState = 1 - activateState;
         //可见性可以挪出来
