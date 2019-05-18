@@ -27,6 +27,7 @@ function init() {
     for(let y=0;y<amount;y++){
         for(let x=0;x<amount;x++){
             let subCamera=new PerspectiveCamera(40,window.innerWidth/window.innerHeight,0.1,10);
+            //bounds属性未定义,这里没法写,运行会报错
             //subCamera.bounds
             subCamera.position.x=(x/amount)-0.5;
             subCamera.position.y=0.5-(y/amount);
