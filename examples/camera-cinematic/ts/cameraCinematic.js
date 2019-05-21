@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
+const utils_1 = require("../../utils");
 let camera, scene, raycaster, renderer;
+let mouse = new three_1.Vector2(), INTERSECTED, oldColorHex;
+let theta = 0, radius = 100;
 init();
 animate();
 /**
@@ -27,13 +30,58 @@ function init() {
         obj.position.set(randPos(), randPos(), randPos());
         scene.add(obj);
     }
+    raycaster = new three_1.Raycaster();
     renderer = new three_1.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+    document.addEventListener('mousemove', function (event) {
+        event.preventDefault();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = (event.clientY / window.innerHeight) * 2 + 1;
+    }, false);
 }
 function animate() {
     requestAnimationFrame(animate);
+    render();
+}
+function cameraFocusAt(targetDistance) {
+}
+function render() {
+    theta += 0.1;
+    let xyRotation = Math.sin(utils_1.degToRad(theta));
+    let zRotation = Math.cos(utils_1.degToRad(theta));
+    camera.position.x = radius * xyRotation;
+    camera.position.y = radius * xyRotation;
+    camera.position.z = radius * zRotation;
+    camera.lookAt(scene.position);
+    camera.updateMatrixWorld(false);
+    raycaster.setFromCamera(mouse, camera);
+    let intersects = raycaster.intersectObjects(scene.children);
+    if (intersects.length > 0) {
+        let targetDistance = intersects[0].distance;
+        cameraFocusAt(targetDistance);
+        //有方块被指向
+        if (INTERSECTED != intersects[0].object) {
+            if (INTERSECTED) {
+                //直接从一个方块到另外一个方块,复原方块颜色
+                let mat = INTERSECTED.material;
+                mat.color.setHex(oldColorHex);
+            }
+            INTERSECTED = intersects[0].object;
+            let mat = INTERSECTED.material;
+            oldColorHex = mat.color.getHex();
+            mat.color.setHex(0xff0000);
+        }
+    }
+    else {
+        if (INTERSECTED) {
+            //失焦,选中非空
+            let mat = INTERSECTED.material;
+            mat.color.setHex(oldColorHex);
+            INTERSECTED = null;
+        }
+    }
     renderer.render(scene, camera);
 }
 //# sourceMappingURL=cameraCinematic.js.map

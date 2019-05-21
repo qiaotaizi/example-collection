@@ -11,7 +11,7 @@ import {degToRad} from "../../utils";
 
 let camera:PerspectiveCamera,scene:Scene,raycaster:Raycaster,renderer:WebGLRenderer;
 
-let mouse:Vector2=new Vector2(),oldColor:number;
+let mouse:Vector2=new Vector2(),INTERSECTED:Object3D|null,oldColorHex:number;
 
 let theta:number=0,radius=100;
 
@@ -93,9 +93,26 @@ function render() {
     if(intersects.length>0){
         let targetDistance=intersects[0].distance;
         cameraFocusAt(targetDistance);
+        //有方块被指向
+        if(INTERSECTED!=intersects[0].object){
+            if(INTERSECTED){
+                //直接从一个方块到另外一个方块,复原方块颜色
+                let mat=(INTERSECTED as Mesh).material as MeshLambertMaterial;
+                mat.color.setHex(oldColorHex);
+            }
+            INTERSECTED=intersects[0].object;
+            let mat=(INTERSECTED as Mesh).material as MeshLambertMaterial;
+            oldColorHex=mat.color.getHex();
+            mat.color.setHex(0xff0000);
+        }
+    }else{
+        if(INTERSECTED){
+            //失焦,选中非空
+            let mat=(INTERSECTED as Mesh).material as MeshLambertMaterial;
+            mat.color.setHex(oldColorHex);
+            INTERSECTED=null;
+        }
     }
-
-
 
     renderer.render(scene,camera);
 
