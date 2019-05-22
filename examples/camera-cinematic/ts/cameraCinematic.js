@@ -6,6 +6,7 @@ let camera, scene, raycaster, renderer;
 let mouse = new three_1.Vector2(), INTERSECTED, oldColorHex;
 let theta = 0, radius = 100;
 init();
+bindEvent();
 animate();
 /**
  * 生成立方体随机位置
@@ -16,7 +17,7 @@ function randPos() {
 function init() {
     camera = new three_1.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
     //景深初值
-    camera.setFocalLength(5);
+    camera.setFocalLength(95);
     camera.position.set(2, 1, 500);
     scene = new three_1.Scene();
     scene.background = new three_1.Color(0xf0f0f0);
@@ -59,7 +60,6 @@ function render() {
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects(scene.children);
     if (intersects.length > 0) {
-        console.log("1");
         let targetDistance = intersects[0].distance;
         cameraFocusAt(targetDistance);
         //有方块被指向
@@ -68,13 +68,11 @@ function render() {
                 //直接从一个方块到另外一个方块,复原方块颜色
                 let mat = INTERSECTED.material;
                 mat.color.setHex(oldColorHex);
-                console.log("2");
             }
             INTERSECTED = intersects[0].object;
             let mat = INTERSECTED.material;
             oldColorHex = mat.color.getHex();
             mat.color.setHex(0xff0000);
-            console.log("3");
         }
     }
     else {
@@ -83,10 +81,21 @@ function render() {
             let mat = INTERSECTED.material;
             mat.color.setHex(oldColorHex);
             INTERSECTED = null;
-            console.log("4");
         }
-        console.log("5");
     }
     renderer.render(scene, camera);
+}
+/**
+ * 绑定鼠标事件
+ */
+function bindEvent() {
+    let addBtn = document.getElementById("add-btn");
+    let minusBtn = document.getElementById("minus-btn");
+    addBtn.addEventListener('click', function (event) {
+        camera.setFocalLength(camera.getFocalLength() + 1);
+    });
+    minusBtn.addEventListener('click', function (event) {
+        camera.setFocalLength(camera.getFocalLength() - 1);
+    });
 }
 //# sourceMappingURL=cameraCinematic.js.map

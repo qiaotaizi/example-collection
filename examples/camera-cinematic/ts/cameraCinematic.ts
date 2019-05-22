@@ -17,6 +17,8 @@ let theta:number=0,radius=100;
 
 init();
 
+bindEvent();
+
 animate();
 
 /**
@@ -29,7 +31,7 @@ function randPos() {
 function init() {
     camera=new PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,1000);
     //景深初值
-    camera.setFocalLength(5);
+    camera.setFocalLength(95);
     camera.position.set(2,1,500);
 
     scene=new Scene();
@@ -114,6 +116,24 @@ function render() {
         }
     }
 
+
+
     renderer.render(scene,camera);
 
+}
+
+/**
+ * 绑定鼠标事件
+ */
+function bindEvent() {
+
+    let addBtn=document.getElementById("add-btn") as HTMLButtonElement;
+    let minusBtn=document.getElementById("minus-btn") as HTMLButtonElement;
+    addBtn.addEventListener('click',function (event) {
+        camera.setFocalLength(camera.getFocalLength()+1);
+    });
+
+    minusBtn.addEventListener('click',function (event) {
+        camera.setFocalLength(camera.getFocalLength()-1);
+    });
 }
