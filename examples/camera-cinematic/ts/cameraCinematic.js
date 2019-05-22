@@ -38,7 +38,7 @@ function init() {
     document.addEventListener('mousemove', function (event) {
         event.preventDefault();
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = (event.clientY / window.innerHeight) * 2 + 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }, false);
 }
 function animate() {
@@ -59,6 +59,7 @@ function render() {
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects(scene.children);
     if (intersects.length > 0) {
+        console.log("1");
         let targetDistance = intersects[0].distance;
         cameraFocusAt(targetDistance);
         //有方块被指向
@@ -67,20 +68,24 @@ function render() {
                 //直接从一个方块到另外一个方块,复原方块颜色
                 let mat = INTERSECTED.material;
                 mat.color.setHex(oldColorHex);
+                console.log("2");
             }
             INTERSECTED = intersects[0].object;
             let mat = INTERSECTED.material;
             oldColorHex = mat.color.getHex();
             mat.color.setHex(0xff0000);
+            console.log("3");
         }
     }
     else {
         if (INTERSECTED) {
-            //失焦,选中非空
+            //鼠标未指向任一对象,将之前获得焦点的对象清空
             let mat = INTERSECTED.material;
             mat.color.setHex(oldColorHex);
             INTERSECTED = null;
+            console.log("4");
         }
+        console.log("5");
     }
     renderer.render(scene, camera);
 }

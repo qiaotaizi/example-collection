@@ -58,7 +58,7 @@ function init() {
     document.addEventListener('mousemove',function (event) {
         event.preventDefault();
         mouse.x=(event.clientX/window.innerWidth)*2-1;
-        mouse.y=(event.clientY/window.innerHeight)*2+1;
+        mouse.y=-(event.clientY/window.innerHeight)*2+1;
     },false)
 
 }
@@ -107,7 +107,7 @@ function render() {
         }
     }else{
         if(INTERSECTED){
-            //失焦,选中非空
+            //鼠标未指向任一对象,将之前获得焦点的对象清空
             let mat=(INTERSECTED as Mesh).material as MeshLambertMaterial;
             mat.color.setHex(oldColorHex);
             INTERSECTED=null;
