@@ -1,5 +1,19 @@
 import {Color, PerspectiveCamera, Scene, WebGLRenderer} from "three";
 
+let scene:Scene,camera:PerspectiveCamera,renderer:WebGLRenderer;
+
+init();
+
+animate();
+
+function init() {
+
+}
+
+function animate() {
+
+}
+
 class GeometryHierarchy2 {
 
     // private camera:PerspectiveCamera;
@@ -25,13 +39,10 @@ class GeometryHierarchy2 {
     animate(this:GeometryHierarchy2) {
 
         console.log(this);
-
+        //该函数在递归过程中 this指向丢失  不能用这种面向对象的写法
+        //引以为戒
         requestAnimationFrame(this.animate);
 
         //this.renderer.render(this.scene,this.camera);
     }
 }
-
-let es=new GeometryHierarchy2();
-
-es.animate();
