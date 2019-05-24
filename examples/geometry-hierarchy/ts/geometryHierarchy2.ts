@@ -8,10 +8,25 @@ animate();
 
 function init() {
 
+    scene=new Scene();
+
+    camera=new PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,10000);
+
+    renderer=new WebGLRenderer({antialias:true});
+
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth,window.innerHeight);
+
+    document.body.appendChild(renderer.domElement);
+    
 }
 
 function animate() {
 
+    renderer.render(scene,camera);
+
+
+    requestAnimationFrame(animate);
 }
 
 class GeometryHierarchy2 {
