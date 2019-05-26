@@ -1,3 +1,13 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+// import {Scene, WebGLRenderer} from "three";
+//
+// export interface IExampleScene {
+//
+//     scene:Scene;
+//
+//     renderer:WebGLRenderer;
+//
+//     animate():void;
+//
+// }
 //# sourceMappingURL=IExampleScene.js.map

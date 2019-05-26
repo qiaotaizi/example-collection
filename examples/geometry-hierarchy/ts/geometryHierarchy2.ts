@@ -1,49 +1,169 @@
 import {
     BoxBufferGeometry,
-    Camera,
     Color,
     Mesh,
-    MeshBasicMaterial,
+    MeshBasicMaterial, MeshNormalMaterial, Object3D,
     PerspectiveCamera,
-    Scene,
+    Scene, ShapeUtils,
     WebGLRenderer
 } from "three";
-import {IExampleScene} from "../../../IExampleScene";
-import {IExampleScene2, SceneExecutor} from "../../../AbstracctExampleScene";
+import area = ShapeUtils.area;
 
 //尝试使用面向对象的编码方式失败,
 //原因是帧渲染时需要调用requestAnimationFrame函数
 //其参数为一个函数,这个函数在被调用过程中,遇到所有需要调用this对象的操作
 //将会无法判断this指向的是什么对象
+//还是回归面向过程的编码方式吧
 
-// let scene:Scene,camera:PerspectiveCamera,renderer:WebGLRenderer;
-//
-// init();
-//
-// animate();
-//
-// function init() {
-//
-//     scene=new Scene();
-//
-//     camera=new PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,10000);
-//
-//     renderer=new WebGLRenderer({antialias:true});
-//
-//     renderer.setPixelRatio(window.devicePixelRatio);
-//     renderer.setSize(window.innerWidth,window.innerHeight);
-//
-//     document.body.appendChild(renderer.domElement);
-//
-// }
-//
-// function animate() {
-//
-//     renderer.render(scene,camera);
-//
-//
-//     requestAnimationFrame(animate);
-// }
+let scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer;
+
+let root: Mesh;
+
+let mouseX = 0, mouseY = 0;
+
+let winWidth = window.innerWidth, winHeight = window.innerHeight;
+
+let halfWidth = winWidth * 0.5, halfHeight = winHeight * 0.5;
+
+init();
+
+bindEvent();
+
+animate();
+
+function init() {
+
+    camera = new PerspectiveCamera(60, winWidth / winHeight, 1, 15000);
+    camera.position.z = 500;
+
+    scene = new Scene();
+    scene.background = new Color(0xffffff);
+
+    let geo = new BoxBufferGeometry(100, 100, 100);
+
+    let mat = new MeshNormalMaterial();
+
+    root = new Mesh(geo, mat);
+    root.position.x = 1000;
+
+    scene.add(root);
+
+    let parent = root, amount = 200;
+
+    for (let i = 0; i < amount; i++) {
+        let obj = new Mesh(geo, mat);
+
+        obj.position.x = 100;
+
+        parent.add(obj);
+        parent = obj;
+    }
+    parent = root;
+
+    for (let i = 0; i < amount; i++) {
+        let obj = new Mesh(geo, mat);
+        obj.position.x = -100;
+
+        parent.add(obj);
+        parent = obj;
+    }
+
+    parent = root;
+
+    for (let i = 0; i < amount; i++) {
+        let obj = new Mesh(geo, mat);
+
+        obj.position.y = 100;
+
+        parent.add(obj);
+        parent = obj;
+    }
+    parent = root;
+
+    for (let i = 0; i < amount; i++) {
+        let obj = new Mesh(geo, mat);
+        obj.position.y = -100;
+
+        parent.add(obj);
+        parent = obj;
+    }
+
+    parent = root;
+
+
+    for (let i = 0; i < amount; i++) {
+        let obj = new Mesh(geo, mat);
+
+        obj.position.z = 100;
+
+        parent.add(obj);
+        parent = obj;
+    }
+    parent = root;
+
+    for (let i = 0; i < amount; i++) {
+        let obj = new Mesh(geo, mat);
+        obj.position.z = -100;
+
+        parent.add(obj);
+        parent = obj;
+    }
+
+    //parent=root;
+
+
+    renderer = new WebGLRenderer({antialias: true});
+
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(winWidth, winHeight);
+
+    document.body.appendChild(renderer.domElement);
+
+}
+
+function bindEvent() {
+
+    //绑定鼠标移动事件
+
+    document.addEventListener('mousemove', function (event: MouseEvent) {
+        mouseX = (event.clientX - halfWidth) * 10;
+        mouseY = (event.clientY - halfHeight) * 10;
+    }, false);
+
+
+}
+
+function animate() {
+
+    render();
+
+
+    requestAnimationFrame(animate);
+}
+
+function render() {
+
+    let time = Date.now() * 0.001;
+
+    let rx = Math.sin(time * 0.7) * 0.2;
+    let ry = Math.sin(time * 0.3) * 0.1;
+    let rz = Math.sin(time * 0.2) * 0.1;
+
+    //通过鼠标事件控制摄像机位置
+    camera.position.x += (mouseX - camera.position.x) * 0.05;
+    camera.position.y += (-mouseY - camera.position.y) * 0.05;
+
+    camera.lookAt(scene.position);
+
+    root.traverse(function (obj: Object3D) {
+
+        obj.rotation.set(rx, ry, rz);
+
+    });
+
+
+    renderer.render(scene, camera);
+}
 
 // class GeometryHierarchy2 implements IExampleScene{
 //
