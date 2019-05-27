@@ -1,0 +1,32 @@
+//场景代码模板
+import {PerspectiveCamera, Scene, WebGLRenderer} from "three";
+
+let camera:PerspectiveCamera,scene:Scene,renderer:WebGLRenderer;
+
+let winWidth=window.innerWidth,winHeight=window.innerHeight;
+
+init();
+
+bindEvent();
+
+animate();
+
+render();
+
+function init() {
+
+}
+
+function bindEvent() {
+
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    render();
+}
+
+function render() {
+
+}
