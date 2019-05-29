@@ -128,7 +128,7 @@ export class LightProbe extends Light{
 
     isLightProbe:boolean= true;
 
-    constructor(sh: SphericalHarmonics3 | undefined,intensity?:number) {
+    constructor(sh?: SphericalHarmonics3,intensity?:number) {
         super(undefined,intensity);
         this.sh=sh!==undefined?sh:new SphericalHarmonics3();
     }
