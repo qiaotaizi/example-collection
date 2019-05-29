@@ -4,9 +4,32 @@
     <meta charset="UTF-8">
     <title>cloth</title>
     <link type="text/css" rel="stylesheet" href="../../example.css" />
+    <link type="text/css" rel="stylesheet" href="../css/lightProbe.css" />
 </head>
 <body>
-
+<div id="control-div">
+    键盘控制
+    <table>
+        <tr>
+            <td>lightProbeIntensity:</td>
+            <td>+(q)</td>
+            <td><span id="value-of-lightprobeintensity" class="value-span"></span></td>
+            <td>-(w)</td>
+        </tr>
+        <tr>
+            <td>directionalLightIntensity:</td>
+            <td>+(a)</td>
+            <td><span id="value-of-directionallightintensity" class="value-span"></span></td>
+            <td>-(s)</td>
+        </tr>
+        <tr>
+            <td>envMapIntensity:</td>
+            <td>+(z)</td>
+            <td><span id="value-of-envmapintensity" class="value-span"></span></td>
+            <td>-(x)</td>
+        </tr>
+    </table>
+</div>
 <script>
     require("../../keyDown");
     require("../ts/lightProbe");

@@ -9,10 +9,103 @@ let winWidth = window.innerWidth, winHeight = window.innerHeight;
 let lightProb, directLight;
 let API = {
     lightProbeIntensity: 1.0,
+    lightProbeIntensityMax: 1.0,
+    lightProbeIntensityMin: 0.0,
+    lightProbeIntensityStep: 0.01,
     directionalLightIntensity: 0.2,
-    envMapIntensity: 1
+    directionalLightIntensityMax: 1.0,
+    directionalLightIntensityMin: 0.0,
+    directionalLightIntensityStep: 0.01,
+    envMapIntensity: 1,
+    envMapIntensityMax: 1.0,
+    envMapIntensityMin: 0.0,
+    envMapIntensityStep: 0.01
 };
 init();
+//设置默认值并添加控制
+spanSetValueAddListener();
+function spanSetValueAddListener() {
+    //设置默认值
+    let lightProbeIntensitySpan = document.getElementById("value-of-lightprobeintensity");
+    if (lightProbeIntensitySpan) {
+        lightProbeIntensitySpan.innerText = API.lightProbeIntensity.toFixed(2);
+    }
+    let directionalLightIntensitySpan = document.getElementById("value-of-directionallightintensity");
+    if (directionalLightIntensitySpan) {
+        directionalLightIntensitySpan.innerText = API.directionalLightIntensity.toFixed(2);
+    }
+    let envMapIntensitySpan = document.getElementById("value-of-envmapintensity");
+    if (envMapIntensitySpan) {
+        envMapIntensitySpan.innerText = API.envMapIntensity.toFixed(2);
+    }
+    window.addEventListener('keydown', function (event) {
+        // console.log(event.key);
+        switch (event.key) {
+            case 'q':
+                if (API.lightProbeIntensity + API.lightProbeIntensityStep <= API.lightProbeIntensityMax) {
+                    API.lightProbeIntensity += API.lightProbeIntensityStep;
+                    if (lightProbeIntensitySpan) {
+                        lightProbeIntensitySpan.innerText = API.lightProbeIntensity.toFixed(2);
+                    }
+                    lightProb.intensity = API.lightProbeIntensity;
+                    render();
+                }
+                break;
+            case 'w':
+                if (API.lightProbeIntensity - API.lightProbeIntensityStep >= API.lightProbeIntensityMin) {
+                    API.lightProbeIntensity -= API.lightProbeIntensityStep;
+                    if (lightProbeIntensitySpan) {
+                        lightProbeIntensitySpan.innerText = API.lightProbeIntensity.toFixed(2);
+                    }
+                    lightProb.intensity = API.lightProbeIntensity;
+                    render();
+                }
+                break;
+            //----------
+            case 'a':
+                if (API.directionalLightIntensity + API.directionalLightIntensityStep <= API.directionalLightIntensityMax) {
+                    API.directionalLightIntensity += API.directionalLightIntensityStep;
+                    if (directionalLightIntensitySpan) {
+                        directionalLightIntensitySpan.innerText = API.directionalLightIntensity.toFixed(2);
+                    }
+                    directLight.intensity = API.directionalLightIntensity;
+                    render();
+                }
+                break;
+            case 's':
+                if (API.directionalLightIntensity - API.directionalLightIntensityStep >= API.directionalLightIntensityMin) {
+                    API.directionalLightIntensity -= API.directionalLightIntensityStep;
+                    if (directionalLightIntensitySpan) {
+                        directionalLightIntensitySpan.innerText = API.directionalLightIntensity.toFixed(2);
+                    }
+                    directLight.intensity = API.directionalLightIntensity;
+                    render();
+                }
+                break;
+            //--------
+            case 'z':
+                if (API.envMapIntensity + API.envMapIntensityStep <= API.envMapIntensityMax) {
+                    API.envMapIntensity += API.envMapIntensityStep;
+                    if (envMapIntensitySpan) {
+                        envMapIntensitySpan.innerText = API.envMapIntensity.toFixed(2);
+                    }
+                    mesh.material.envMapIntensity = API.envMapIntensity;
+                    render();
+                }
+                break;
+            case 'x':
+                if (API.envMapIntensity - API.envMapIntensityStep >= API.envMapIntensityMin) {
+                    API.envMapIntensity -= API.envMapIntensityStep;
+                    if (envMapIntensitySpan) {
+                        envMapIntensitySpan.innerText = API.envMapIntensity.toFixed(2);
+                    }
+                    mesh.material.envMapIntensity = API.envMapIntensity;
+                    render();
+                }
+                break;
+        }
+    });
+}
 function init() {
     renderer = new three_1.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -45,7 +138,7 @@ function init() {
         cubeTexture.encoding = three_1.sRGBEncoding;
         scene.background = cubeTexture;
         let lp = lightProbeC_1.LightProbeGenerator.fromCubeTexture(cubeTexture);
-        if (lp !== null) {
+        if (lp) {
             lightProb.copy(lp);
             console.log(lp);
             let geo = new three_1.SphereBufferGeometry(5, 64, 32);

@@ -20,7 +20,7 @@ class LightProbeGenerator {
             canvas.height = height;
             let context = canvas.getContext('2d');
             let imageData;
-            if (context !== null) {
+            if (context) {
                 context.drawImage(image, 0, 0, width, height);
                 imageData = context.getImageData(0, 0, width, height);
             }
@@ -91,7 +91,7 @@ class LightProbe extends three_1.Light {
     constructor(sh, intensity) {
         super(undefined, intensity);
         this.isLightProbe = true;
-        this.sh = sh !== undefined ? sh : new SphericalHarmonics3();
+        this.sh = sh ? sh : new SphericalHarmonics3();
     }
     copy(source, recursive) {
         super.copy(source);

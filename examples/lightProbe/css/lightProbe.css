@@ -1,0 +1,14 @@
+canvas{
+    position: absolute;
+    z-index: 0;
+    display: block;
+}
+
+#control-div{
+    float: left;
+    position: relative;
+    z-index: 1;
+    background-color: rgba(255,255,255,0.5);
+    width: 350px;
+    height: 100px;
+}
