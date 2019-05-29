@@ -1,7 +1,8 @@
 import {Color, CubeTexture, Light, Object3D, Vector3} from "three";
+import {ColorHelper} from "../../ColorHelper";
 
 export class LightProbeGenerator {
-    static fromCubeTexture(cubeTexture:CubeTexture): LightProbe {
+    static fromCubeTexture(cubeTexture:CubeTexture): LightProbe | null {
 
         let norm, lengthSq, weight, totalWeight = 0;
 
@@ -30,10 +31,15 @@ export class LightProbeGenerator {
 
             let context = canvas.getContext( '2d' );
 
+            let imageData;
+            if(context!==null){
+                context.drawImage( image, 0, 0, width, height );
+                imageData = context.getImageData( 0, 0, width, height );
 
-            context.drawImage( image, 0, 0, width, height );
-
-            let imageData = context.getImageData( 0, 0, width, height );
+            }else{
+                throw new Error("canvas get 2d context fail");
+                return null;
+            }
 
             let data = imageData.data;
 
@@ -47,7 +53,7 @@ export class LightProbeGenerator {
                 color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
                 // convert to linear color space
-                color.copySRGBToLinear( color );
+                color=ColorHelper.copySRGBToLinear( color );
 
                 // pixel coordinate on unit cube
 
