@@ -37,7 +37,7 @@ export class LightProbeGenerator {
                 imageData = context.getImageData( 0, 0, width, height );
 
             }else{
-                throw new Error("canvas get 2d context fail");
+                console.warn("LightProbeGenerator get canvas 2d context failed, reture null");
                 return null;
             }
 
