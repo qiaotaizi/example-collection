@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
-const utils_1 = require("../../utils");
+const MathUtils_1 = require("../../MathUtils");
 let camera, scene, renderer;
 // let activateCamera:Camera,activateCameraHelper:CameraHelper;
 let perspectiveCamera, orthographicCamera;
@@ -63,9 +63,9 @@ function init() {
     for (let i = 0; i < 10000; i++) {
         //Random float from <-range/2, range/2> interval
         //_Math.randFloatSpread 无法调用 这里重新声明一次
-        vertivles.push(utils_1.randFloatSpread2(2000));
-        vertivles.push(utils_1.randFloatSpread2(2000));
-        vertivles.push(utils_1.randFloatSpread2(2000));
+        vertivles.push(MathUtils_1.randFloatSpread2(2000));
+        vertivles.push(MathUtils_1.randFloatSpread2(2000));
+        vertivles.push(MathUtils_1.randFloatSpread2(2000));
     }
     geometry.addAttribute('position', new three_1.Float32BufferAttribute(vertivles, 3));
     let particles = new three_1.Points(geometry, new three_1.PointsMaterial({ color: 0xffffff }));

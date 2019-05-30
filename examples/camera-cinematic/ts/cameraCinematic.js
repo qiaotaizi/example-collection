@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
-const utils_1 = require("../../utils");
+const MathUtils_1 = require("../../MathUtils");
 let camera, scene, raycaster, renderer;
 let mouse = new three_1.Vector2(), INTERSECTED, oldColorHex;
 let theta = 0, radius = 100;
@@ -50,8 +50,8 @@ function cameraFocusAt(targetDistance) {
 }
 function render() {
     theta += 0.1;
-    let xyRotation = Math.sin(utils_1.degToRad(theta));
-    let zRotation = Math.cos(utils_1.degToRad(theta));
+    let xyRotation = Math.sin(MathUtils_1.degToRad(theta));
+    let zRotation = Math.cos(MathUtils_1.degToRad(theta));
     camera.position.x = radius * xyRotation;
     camera.position.y = radius * xyRotation;
     camera.position.z = radius * zRotation;

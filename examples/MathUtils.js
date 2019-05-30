@@ -19,4 +19,4 @@ function radToDeg(radians) {
 exports.radToDeg = radToDeg;
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
-//# sourceMappingURL=utils.js.map
+//# sourceMappingURL=MathUtils.js.map

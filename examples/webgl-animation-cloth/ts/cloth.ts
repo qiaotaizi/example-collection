@@ -12,12 +12,9 @@ import {
     WebGLRenderer
 } from "three";
 
-const OrbitControls = require('three-orbitcontrols');
-
 import {Cloth, Constraint} from "./clothC";
 import {ClothConstants} from "./constants";
-
-const clothFunction = require("./clothFunction");
+import {JOrbitControls} from "../../JOrbitControls";
 
 let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer;
 
@@ -30,6 +27,15 @@ let clothGeo: ParametricBufferGeometry;
 let tmpForce = new Vector3();
 
 let gravity = new Vector3(0, -ClothConstants.GRAVITY, 0).multiplyScalar(ClothConstants.MASS);
+
+let clothFunction=((width: number, height: number)=>{
+    return function (u: number, v: number, target: Vector3): void {
+        let x = (u - 0.5) * width;
+        let y = (v + 0.5) * height;
+        let z = 0;
+        target.set(x, y, z);
+    }
+})(ClothConstants.restDistance * ClothConstants.xSegs, ClothConstants.restDistance * ClothConstants.ySegs);
 
 init();
 
@@ -148,7 +154,7 @@ function init() {
     renderer.shadowMap.enabled = true;//如果设置, 请在场景中使用阴影贴图
 
     //controls
-    let controls = new OrbitControls(camera, renderer.domElement);
+    let controls = new JOrbitControls(camera, renderer.domElement);
     controls.maxPolarAngle = Math.PI * 0.5;
     controls.minDistance = 1000;
     controls.maxDistance = 5000;

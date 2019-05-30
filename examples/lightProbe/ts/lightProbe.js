@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
-//const OrbitControls = require('three-orbitcontrols');
 const lightProbeC_1 = require("./lightProbeC");
-const JOrbitControls_1 = require("../../../JOrbitControls");
+const JOrbitControls_1 = require("../../JOrbitControls");
 let camera, scene, renderer, mesh;
 let winWidth = window.innerWidth, winHeight = window.innerHeight;
 //光照探头

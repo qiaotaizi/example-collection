@@ -4,16 +4,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * 画面渲染代码
  */
 const three_1 = require("three");
-const OrbitControls = require('three-orbitcontrols');
 const clothC_1 = require("./clothC");
 const constants_1 = require("./constants");
-const clothFunction = require("./clothFunction");
+const JOrbitControls_1 = require("../../JOrbitControls");
 let camera, scene, renderer;
 let windForce = new three_1.Vector3(0, 0, 0);
 let cloth = new clothC_1.Cloth(constants_1.ClothConstants.xSegs, constants_1.ClothConstants.ySegs);
 let clothGeo;
 let tmpForce = new three_1.Vector3();
 let gravity = new three_1.Vector3(0, -constants_1.ClothConstants.GRAVITY, 0).multiplyScalar(constants_1.ClothConstants.MASS);
+let clothFunction = ((width, height) => {
+    return function (u, v, target) {
+        let x = (u - 0.5) * width;
+        let y = (v + 0.5) * height;
+        let z = 0;
+        target.set(x, y, z);
+    };
+})(constants_1.ClothConstants.restDistance * constants_1.ClothConstants.xSegs, constants_1.ClothConstants.restDistance * constants_1.ClothConstants.ySegs);
 init();
 animate();
 /**
@@ -117,7 +124,7 @@ function init() {
     renderer.gammaOutput = true; //如果设置, 那么它期望所有纹理和颜色需要乘以gamma输出
     renderer.shadowMap.enabled = true; //如果设置, 请在场景中使用阴影贴图
     //controls
-    let controls = new OrbitControls(camera, renderer.domElement);
+    let controls = new JOrbitControls_1.JOrbitControls(camera, renderer.domElement);
     controls.maxPolarAngle = Math.PI * 0.5;
     controls.minDistance = 1000;
     controls.maxDistance = 5000;

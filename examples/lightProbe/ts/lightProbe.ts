@@ -8,10 +8,8 @@ import {
     WebGLRenderer
 } from "three";
 
-//const OrbitControls = require('three-orbitcontrols');
 import {LightProbe, LightProbeGenerator} from "./lightProbeC";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
-import {JOrbitControls} from "../../../JOrbitControls";
+import {JOrbitControls} from "../../JOrbitControls";
 
 let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer, mesh: Mesh;
 
