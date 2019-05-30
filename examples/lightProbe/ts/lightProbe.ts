@@ -175,7 +175,6 @@ function init() {
         let lp = LightProbeGenerator.fromCubeTexture(cubeTexture);
         if (lp) {
             lightProb.copy(lp);
-            console.log(lp);
             let geo = new SphereBufferGeometry(5, 64, 32);
             let mat = new MeshStandardMaterial({
                 color: 0xffffff,
