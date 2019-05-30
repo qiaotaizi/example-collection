@@ -10,7 +10,9 @@ import {
     Vector3
 } from "three";
 
-//取代一些地方的this调用
+//取代事件监听回调函数中的this调用
+//因为在指向回调函数时,this将不再是JOrbitControls对象本身
+//可能是global/canvas等其他对象
 let scope:JOrbitControls;
 
 export class JOrbitControls extends EventDispatcher {
@@ -36,8 +38,6 @@ export class JOrbitControls extends EventDispatcher {
 
     constructor(camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
         super();
-        console.log(1);
-        console.log(scope);
         this.camera = camera;
         this.domElement = domElement;
         this.position0 = this.camera.position.clone();
@@ -122,7 +122,10 @@ export class JOrbitControls extends EventDispatcher {
 
         })();
 
-        // this method is exposed, but perhaps it would be better if we can make it private...
+        //update必须在这里进行定义
+        //如果在构造函数外部定义
+        //编译后的js代码将使得update函数的声明先于在构造函数中初始化的成员变量
+        //这时,this.camera将是undefined
         this.update = (() => {
 
             let offset = new Vector3();
@@ -234,9 +237,6 @@ export class JOrbitControls extends EventDispatcher {
 
         // force an update at start
         this.update();
-
-        console.log(2);
-        console.log(scope);
     }
 
     // Set to false to disable this control
