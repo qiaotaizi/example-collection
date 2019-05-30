@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
-const OrbitControls = require('three-orbitcontrols');
+//const OrbitControls = require('three-orbitcontrols');
 const lightProbeC_1 = require("./lightProbeC");
+const JOrbitControls_1 = require("../../../JOrbitControls");
 let camera, scene, renderer, mesh;
 let winWidth = window.innerWidth, winHeight = window.innerHeight;
 //光照探头
@@ -116,7 +117,7 @@ function init() {
     scene = new three_1.Scene();
     camera = new three_1.PerspectiveCamera(40, winWidth / winHeight, 1, 1000);
     camera.position.set(0, 0, 30);
-    let controls = new OrbitControls(camera, renderer.domElement);
+    let controls = new JOrbitControls_1.JOrbitControls(camera, renderer.domElement);
     controls.addEventListener('change', render);
     controls.minDistance = 10;
     controls.maxDistance = 50;

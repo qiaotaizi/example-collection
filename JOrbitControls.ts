@@ -12,14 +12,18 @@ import {
 
 export class JOrbitControls extends EventDispatcher {
 
-    object: PerspectiveCamera | OrthographicCamera;
+    // "target" sets the location of focus, where the object orbits around
+    target: Vector3 = new Vector3();
+    // for reset
+    target0: Vector3 = this.target.clone();
+    position0: Vector3;
+    zoom0:number;
 
-    domElement: HTMLElement;
-
-    constructor(camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
+    constructor(public camera: PerspectiveCamera | OrthographicCamera, public domElement: HTMLElement) {
         super();
-        this.object = camera;
-        this.domElement = domElement;
+
+        this.position0 = this.camera.position.clone();
+        this.zoom0=this.camera.zoom;
 
         this.domElement.addEventListener('contextmenu', this.onContextMenu, false);
 
@@ -32,15 +36,17 @@ export class JOrbitControls extends EventDispatcher {
 
         window.addEventListener('keydown', this.onKeyDown, false);
 
+        console.log("events added");
+        console.log("constructor");
+        console.log(this);
+        console.log(this.camera);
+        console.log(this.zoom0);
         // force an update at start
         this.update();
     }
 
     // Set to false to disable this control
     enabled: boolean = true;
-
-    // "target" sets the location of focus, where the object orbits around
-    target: Vector3 = new Vector3();
 
     // How far you can dolly in and out ( PerspectiveCamera only )
     minDistance: number = 0;
@@ -91,11 +97,6 @@ export class JOrbitControls extends EventDispatcher {
     // The four arrow keys
     keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
 
-    // for reset
-    target0: Vector3 = this.target.clone();
-    position0: Vector3 = this.object.position.clone();
-    zoom0 = this.object.zoom;
-
     private changeEvent = {type: 'change'};
     private startEvent = {type: 'start'};
     private endEvent = {type: 'end'};
@@ -134,17 +135,17 @@ export class JOrbitControls extends EventDispatcher {
 
     saveState(): void {
         this.target0.copy(this.target);
-        this.position0.copy(this.object.position);
-        this.zoom0 = this.object.zoom;
+        this.position0.copy(this.camera.position);
+        this.zoom0 = this.camera.zoom;
 
     };
 
     reset(): void {
         this.target.copy(this.target0);
-        this.object.position.copy(this.position0);
-        this.object.zoom = this.zoom0;
+        this.camera.position.copy(this.position0);
+        this.camera.zoom = this.zoom0;
 
-        this.object.updateProjectionMatrix();
+        this.camera.updateProjectionMatrix();
         this.dispatchEvent(this.changeEvent);
 
         this.update();
@@ -211,14 +212,14 @@ export class JOrbitControls extends EventDispatcher {
 
         return (distance: number, objectMatrix: Matrix4): void => {
 
-            if (this.screenSpacePanning === true) {
+            if (this.screenSpacePanning) {
 
                 v.setFromMatrixColumn(objectMatrix, 1);
 
             } else {
 
                 v.setFromMatrixColumn(objectMatrix, 0);
-                v.crossVectors(this.object.up, v);
+                v.crossVectors(this.camera.up, v);
 
             }
 
@@ -238,25 +239,25 @@ export class JOrbitControls extends EventDispatcher {
 
             let element = this.domElement;
 
-            if (this.object instanceof PerspectiveCamera) {
+            if (this.camera instanceof PerspectiveCamera) {
 
                 // perspective
-                var position = this.object.position;
+                var position = this.camera.position;
                 offset.copy(position).sub(this.target);
                 var targetDistance = offset.length();
 
                 // half of the fov is center to top of screen
-                targetDistance *= Math.tan((this.object.fov / 2) * Math.PI / 180.0);
+                targetDistance *= Math.tan((this.camera.fov / 2) * Math.PI / 180.0);
 
                 // we use only clientHeight here so aspect ratio does not distort speed
-                this.panLeft(2 * deltaX * targetDistance / element.clientHeight, this.object.matrix);
-                this.panUp(2 * deltaY * targetDistance / element.clientHeight, this.object.matrix);
+                this.panLeft(2 * deltaX * targetDistance / element.clientHeight, this.camera.matrix);
+                this.panUp(2 * deltaY * targetDistance / element.clientHeight, this.camera.matrix);
 
-            } else if (this.object instanceof OrthographicCamera) {
+            } else if (this.camera instanceof OrthographicCamera) {
 
                 // orthographic
-                this.panLeft(deltaX * (this.object.right - this.object.left) / this.object.zoom / element.clientWidth, this.object.matrix);
-                this.panUp(deltaY * (this.object.top - this.object.bottom) / this.object.zoom / element.clientHeight, this.object.matrix);
+                this.panLeft(deltaX * (this.camera.right - this.camera.left) / this.camera.zoom / element.clientWidth, this.camera.matrix);
+                this.panUp(deltaY * (this.camera.top - this.camera.bottom) / this.camera.zoom / element.clientHeight, this.camera.matrix);
 
             } else {
 
@@ -272,14 +273,14 @@ export class JOrbitControls extends EventDispatcher {
 
     dollyIn(dollyScale: number): void {
 
-        if (this.object instanceof PerspectiveCamera) {
+        if (this.camera instanceof PerspectiveCamera) {
 
             this.scale /= dollyScale;
 
-        } else if (this.object instanceof OrthographicCamera) {
+        } else if (this.camera instanceof OrthographicCamera) {
 
-            this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom * dollyScale));
-            this.object.updateProjectionMatrix();
+            this.camera.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.camera.zoom * dollyScale));
+            this.camera.updateProjectionMatrix();
             this.zoomChanged = true;
 
         } else {
@@ -291,14 +292,14 @@ export class JOrbitControls extends EventDispatcher {
 
     dollyOut(dollyScale: number): void {
 
-        if (this.object instanceof PerspectiveCamera) {
+        if (this.camera instanceof PerspectiveCamera) {
 
             this.scale *= dollyScale;
 
-        } else if (this.object instanceof OrthographicCamera) {
+        } else if (this.camera instanceof OrthographicCamera) {
 
-            this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / dollyScale));
-            this.object.updateProjectionMatrix();
+            this.camera.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.camera.zoom / dollyScale));
+            this.camera.updateProjectionMatrix();
             this.zoomChanged = true;
 
         } else {
@@ -569,7 +570,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onMouseDown(event: MouseEvent) {
 
-        if (this.enabled === false) return;
+        if (!this.enabled) return;
 
         // Prevent the browser from scrolling.
 
@@ -586,7 +587,7 @@ export class JOrbitControls extends EventDispatcher {
 
                 if (event.ctrlKey || event.metaKey || event.shiftKey) {
 
-                    if (this.enablePan === false) return;
+                    if (!this.enablePan) return;
 
                     this.handleMouseDownPan(event);
 
@@ -594,7 +595,7 @@ export class JOrbitControls extends EventDispatcher {
 
                 } else {
 
-                    if (this.enableRotate === false) return;
+                    if (!this.enableRotate) return;
 
                     this.handleMouseDownRotate(event);
 
@@ -606,7 +607,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case MOUSE.MIDDLE:
 
-                if (this.enableZoom === false) return;
+                if (!this.enableZoom) return;
 
                 this.handleMouseDownDolly(event);
 
@@ -616,7 +617,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case MOUSE.RIGHT:
 
-                if (this.enablePan === false) return;
+                if (!this.enablePan) return;
 
                 this.handleMouseDownPan(event);
 
@@ -639,7 +640,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onMouseMove(event: MouseEvent) {
 
-        if (this.enabled === false) return;
+        if (!this.enabled) return;
 
         event.preventDefault();
 
@@ -647,7 +648,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case STATE.ROTATE:
 
-                if (this.enableRotate === false) return;
+                if (!this.enableRotate) return;
 
                 this.handleMouseMoveRotate(event);
 
@@ -655,7 +656,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case STATE.DOLLY:
 
-                if (this.enableZoom === false) return;
+                if (!this.enableZoom) return;
 
                 this.handleMouseMoveDolly(event);
 
@@ -663,7 +664,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case STATE.PAN:
 
-                if (this.enablePan === false) return;
+                if (!this.enablePan) return;
 
                 this.handleMouseMovePan(event);
 
@@ -675,7 +676,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onMouseUp(event: MouseEvent) {
 
-        if (this.enabled === false) return;
+        if (!this.enabled) return;
 
         this.handleMouseUp(event);
 
@@ -690,8 +691,8 @@ export class JOrbitControls extends EventDispatcher {
 
     onMouseWheel(event: MouseWheelEvent) {
 
-        if (this.enabled === false ||
-            this.enableZoom === false ||
+        if (!this.enabled ||
+            !this.enableZoom ||
             (this.state !== STATE.NONE &&
                 this.state !== STATE.ROTATE)) return;
 
@@ -708,7 +709,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onKeyDown(event: KeyboardEvent) {
 
-        if (this.enabled === false || this.enableKeys === false || this.enablePan === false) return;
+        if (!this.enabled || !this.enableKeys || !this.enablePan) return;
 
         this.handleKeyDown(event);
 
@@ -716,7 +717,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onTouchStart(event: TouchEvent) {
 
-        if (this.enabled === false) return;
+        if (!this.enabled) return;
 
         event.preventDefault();
 
@@ -724,7 +725,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case 1:	// one-fingered touch: rotate
 
-                if (this.enableRotate === false) return;
+                if (!this.enableRotate) return;
 
                 this.handleTouchStartRotate(event);
 
@@ -734,7 +735,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case 2:	// two-fingered touch: dolly-pan
 
-                if (this.enableZoom === false && this.enablePan === false) return;
+                if (!this.enableZoom && !this.enablePan) return;
 
                 this.handleTouchStartDollyPan(event);
 
@@ -758,7 +759,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onTouchMove(event: TouchEvent) {
 
-        if (this.enabled === false) return;
+        if (!this.enabled) return;
 
         event.preventDefault();
         event.stopPropagation();
@@ -767,7 +768,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case 1: // one-fingered touch: rotate
 
-                if (this.enableRotate === false) return;
+                if (!this.enableRotate) return;
                 if (this.state !== STATE.TOUCH_ROTATE) return; // is this needed?
 
                 this.handleTouchMoveRotate(event);
@@ -776,7 +777,7 @@ export class JOrbitControls extends EventDispatcher {
 
             case 2: // two-fingered touch: dolly-pan
 
-                if (this.enableZoom === false && this.enablePan === false) return;
+                if (!this.enableZoom && !this.enablePan) return;
                 if (this.state !== STATE.TOUCH_DOLLY_PAN) return; // is this needed?
 
                 this.handleTouchMoveDollyPan(event);
@@ -793,7 +794,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onTouchEnd(event: TouchEvent) {
 
-        if (this.enabled === false) return;
+        if (!this.enabled) return;
 
         this.handleTouchEnd(event);
 
@@ -805,7 +806,7 @@ export class JOrbitControls extends EventDispatcher {
 
     onContextMenu(event: MouseEvent) {
 
-        if (this.enabled === false) return;
+        if (!this.enabled) return;
 
         event.preventDefault();
 
@@ -818,7 +819,11 @@ export class JOrbitControls extends EventDispatcher {
         let offset = new Vector3();
 
         // so camera.up is the orbit axis
-        let quat = new Quaternion().setFromUnitVectors(this.object.up, new Vector3(0, 1, 0));
+        console.log("update");
+        console.log(this);
+        console.log(this.camera);
+        console.log(this.zoom0);
+        let quat = new Quaternion().setFromUnitVectors(this.camera.up, new Vector3(0, 1, 0));
         let quatInverse = quat.clone().inverse();
 
         let lastPosition = new Vector3();
@@ -826,7 +831,7 @@ export class JOrbitControls extends EventDispatcher {
 
         return (): boolean => {
 
-            let position = this.object.position;
+            let position = this.camera.position;
 
             offset.copy(position).sub(this.target);
 
@@ -869,9 +874,9 @@ export class JOrbitControls extends EventDispatcher {
 
             position.copy(this.target).add(offset);
 
-            this.object.lookAt(this.target);
+            this.camera.lookAt(this.target);
 
-            if (this.enableDamping === true) {
+            if (this.enableDamping) {
 
                 this.sphericalDelta.theta *= (1 - this.dampingFactor);
                 this.sphericalDelta.phi *= (1 - this.dampingFactor);
@@ -893,13 +898,13 @@ export class JOrbitControls extends EventDispatcher {
             // using small-angle approximation cos(x/2) = 1 - x^2 / 8
 
             if (this.zoomChanged ||
-                lastPosition.distanceToSquared(this.object.position) > this.EPS ||
-                8 * (1 - lastQuaternion.dot(this.object.quaternion)) > this.EPS) {
+                lastPosition.distanceToSquared(this.camera.position) > this.EPS ||
+                8 * (1 - lastQuaternion.dot(this.camera.quaternion)) > this.EPS) {
 
                 this.dispatchEvent(this.changeEvent);
 
-                lastPosition.copy(this.object.position);
-                lastQuaternion.copy(this.object.quaternion);
+                lastPosition.copy(this.camera.position);
+                lastQuaternion.copy(this.camera.quaternion);
                 this.zoomChanged = false;
 
                 return true;

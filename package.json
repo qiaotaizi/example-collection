@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node test.js",
-    "tttt": "node ./examples/geometry-hierarchy/ts/geometryHierarchy2.js",
+    "t2": "node ./test2.js",
     "start": "electron .",
     "package": "electron-packager ./ example-collection --platform=win32 --arch=x64 --out ../../electronOutput --electron-version 5.0.1 --overwrite",
     "dist-win": "electron-builder --win --x64"

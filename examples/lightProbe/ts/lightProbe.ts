@@ -8,8 +8,10 @@ import {
     WebGLRenderer
 } from "three";
 
-const OrbitControls = require('three-orbitcontrols');
+//const OrbitControls = require('three-orbitcontrols');
 import {LightProbe, LightProbeGenerator} from "./lightProbeC";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import {JOrbitControls} from "../../../JOrbitControls";
 
 let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer, mesh: Mesh;
 
@@ -143,7 +145,7 @@ function init() {
     camera = new PerspectiveCamera(40, winWidth / winHeight, 1, 1000);
     camera.position.set(0, 0, 30);
 
-    let controls = new OrbitControls(camera, renderer.domElement);
+    let controls = new JOrbitControls(camera, renderer.domElement);
     controls.addEventListener('change', render);
     controls.minDistance = 10;
     controls.maxDistance = 50;

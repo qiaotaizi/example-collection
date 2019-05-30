@@ -1,21 +1,23 @@
 class MyClass{
 
-    constructor(){
+    member1:number;
 
-
-    }
-
-    myFunction():void{
+    constructor(member1:number){
+        this.member1=member1;
+        console.log("at constructor");
         console.log(this);
+        console.log(this.member1);
+        this.myFunction();
     }
 
-    member:number=1;
-
-    //myFunction3:(param1:number,param2:number)=>void;
-
-    myFunction2(param1:number,param2:number):void{
+    myFunction(){
+        console.log("at myFunction");
+        console.log(this);
+        console.log(this.member1)
     }
 
 }
 
-new MyClass().myFunction();
+let mc=new MyClass(1);
+
+mc.myFunction();
