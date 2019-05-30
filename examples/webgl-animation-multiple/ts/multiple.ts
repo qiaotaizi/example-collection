@@ -7,13 +7,12 @@ import {
     Fog,
     HemisphereLight, Mesh, MeshPhongMaterial, Object3D, PCFSoftShadowMap,
     PerspectiveCamera, PlaneBufferGeometry,
-    Scene, SceneUtils, Skeleton, SkeletonHelper, Vector3,
+    Scene, Vector3,
     WebGLRenderer
 } from "three";
 import {RenderUnit} from "./multipleC";
 import initGLTFLoader = require("../../initGLTFLoader");
 import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
-import {SkeletonUtils} from "three/examples/jsm/utils/SkeletonUtils";
 
 let scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer;
 

@@ -23,7 +23,7 @@ function init() {
     let sphereMesh = new three_1.Mesh(new three_1.SphereBufferGeometry(70, 20, 10), mat);
     sphereMesh.position.set(-300, 0, 200);
     scene.add(sphereMesh);
-    //
+    //二十面缓冲几何体
     let icosahedronMesh = new three_1.Mesh(new three_1.IcosahedronBufferGeometry(75, 1), mat);
     icosahedronMesh.position.set(-100, 0, 200);
     scene.add(icosahedronMesh);
