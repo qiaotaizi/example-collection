@@ -1,11 +1,22 @@
 import {
-    AmbientLight, DoubleSide, IcosahedronBufferGeometry, Mesh,
+    AmbientLight,
+    BoxBufferGeometry,
+    CircleBufferGeometry,
+    CylinderBufferGeometry,
+    DoubleSide,
+    IcosahedronBufferGeometry, LatheBufferGeometry,
+    Mesh,
     MeshPhongMaterial,
+    OctahedronBufferGeometry,
     PerspectiveCamera,
+    PlaneBufferGeometry,
     PointLight,
     RepeatWrapping,
-    Scene, SphereBufferGeometry,
-    TextureLoader,
+    RingBufferGeometry,
+    Scene,
+    SphereBufferGeometry,
+    TetrahedronBufferGeometry,
+    TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2, Vector3,
     WebGLRenderer
 } from "three";
 
@@ -42,12 +53,67 @@ function init() {
     sphereMesh.position.set(-300,0,200);
     scene.add(sphereMesh);
 
-    //二十面缓冲几何体
+    //二十面体
     let icosahedronMesh = new Mesh( new IcosahedronBufferGeometry( 75, 1 ), mat );
     icosahedronMesh.position.set( - 100, 0, 200 );
     scene.add( icosahedronMesh );
 
+    //八面体
+    let octahedronMesh = new Mesh( new OctahedronBufferGeometry( 75, 2 ), mat );
+    octahedronMesh.position.set( 100, 0, 200 );
+    scene.add( octahedronMesh );
 
+    //四面体
+    let tetrahedronMesh = new Mesh( new TetrahedronBufferGeometry( 75, 0 ), mat );
+    tetrahedronMesh.position.set( 300, 0, 200 );
+    scene.add( tetrahedronMesh );
+
+    //平面
+    let planeMesh = new Mesh( new PlaneBufferGeometry( 100, 100, 4, 4 ), mat );
+    planeMesh.position.set( - 300, 0, 0 );
+    scene.add( planeMesh );
+
+    //长方体/立方体
+    let boxMesh = new Mesh( new BoxBufferGeometry( 100, 100, 100, 4, 4, 4 ), mat );
+    boxMesh.position.set( - 100, 0, 0 );
+    scene.add( boxMesh );
+
+    //圆形平面
+    let circleMesh = new Mesh( new CircleBufferGeometry( 50, 20, 0, Math.PI * 2 ), mat );
+    circleMesh.position.set( 100, 0, 0 );
+    scene.add( circleMesh );
+
+    //环形平面
+    let ringMesh = new Mesh( new RingBufferGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), mat );
+    ringMesh.position.set( 300, 0, 0 );
+    scene.add( ringMesh );
+
+    //圆柱体/棱柱体
+    let cylinderMesh = new Mesh( new CylinderBufferGeometry( 25, 75, 100, 40, 5 ), mat );
+    cylinderMesh.position.set( - 300, 0, - 200 );
+    scene.add( cylinderMesh );
+
+    //车削几何体
+    let points=new Array<Vector2>();
+    for (let i=0;i<50;i++){
+        let x=Math.sin(i*0.2)*Math.sin(i*0.1)*15+50;
+        let y=(i-5)*2;
+        // console.log(x+","+y);
+        points.push(new Vector2(x,y));
+    }
+    let latheMesh=new Mesh(new LatheBufferGeometry(points,20),mat);
+    latheMesh.position.set( - 100, 0, - 200 );
+    scene.add( latheMesh );
+
+    //圆环体
+    let torusMesh = new Mesh( new TorusBufferGeometry( 50, 20, 20, 20 ), mat );
+    torusMesh.position.set( 100, 0, - 200 );
+    scene.add( torusMesh );
+
+    //复杂圆环体
+    let torusKnot = new Mesh( new TorusKnotBufferGeometry( 50, 10, 50, 20 ), mat );
+    torusKnot.position.set( 300, 0, - 200 );
+    scene.add( torusKnot );
 
     renderer=new WebGLRenderer({antialias:true});
     renderer.setPixelRatio(window.devicePixelRatio);
