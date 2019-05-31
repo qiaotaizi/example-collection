@@ -60,7 +60,7 @@ function init() {
     for (let i = 0; i < 50; i++) {
         let x = Math.sin(i * 0.2) * Math.sin(i * 0.1) * 15 + 50;
         let y = (i - 5) * 2;
-        console.log(x + "," + y);
+        // console.log(x+","+y);
         points.push(new three_1.Vector2(x, y));
     }
     let latheMesh = new three_1.Mesh(new three_1.LatheBufferGeometry(points, 20), mat);

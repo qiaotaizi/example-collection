@@ -10,7 +10,7 @@ import {
     SphereBufferGeometry,
     WebGLRenderer
 } from "three";
-import {randFloatSpread2} from "../../MathUtils";
+import {randFloatSpread2} from "../../../utils/MathUtils";
 
 let camera:PerspectiveCamera,scene:Scene,renderer:WebGLRenderer;
 

@@ -7,7 +7,7 @@ import {
     Raycaster,
     Scene, Vector2, WebGLRenderer
 } from "three";
-import {degToRad} from "../../MathUtils";
+import {degToRad} from "../../../utils/MathUtils";
 
 let camera:PerspectiveCamera,scene:Scene,raycaster:Raycaster,renderer:WebGLRenderer;
 

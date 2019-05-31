@@ -1,5 +1,5 @@
 import {Color, CubeTexture, Light, Object3D, Vector3} from "three";
-import {ColorHelper} from "../../ColorHelper";
+import {ColorHelper} from "../../../utils/ColorHelper";
 
 export class LightProbeGenerator {
     static fromCubeTexture(cubeTexture:CubeTexture): LightProbe | null {

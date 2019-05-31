@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
 const clothC_1 = require("./clothC");
 const constants_1 = require("./constants");
-const JOrbitControls_1 = require("../../JOrbitControls");
+const JOrbitControls_1 = require("../../../JControls/JOrbitControls");
 let camera, scene, renderer;
 let windForce = new three_1.Vector3(0, 0, 0);
 let cloth = new clothC_1.Cloth(constants_1.ClothConstants.xSegs, constants_1.ClothConstants.ySegs);

@@ -9,7 +9,7 @@ import {
 } from "three";
 
 import {LightProbe, LightProbeGenerator} from "./lightProbeC";
-import {JOrbitControls} from "../../JOrbitControls";
+import {JOrbitControls} from "../../../JControls/JOrbitControls";
 
 let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer, mesh: Mesh;
 

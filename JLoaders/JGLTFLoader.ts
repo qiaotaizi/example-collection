@@ -1,7 +1,6 @@
 import {AnimationClip, Camera, DefaultLoadingManager, FileLoader, LoaderUtils, LoadingManager, Scene} from "three";
 import {JDracoLoader} from "./JDracoLoader";
-import {NameMap} from "./NameMap";
-
+import {NameMap} from "../utils/NameMap";
 
 let BINARY_EXTENSION_BUFFER_NAME:string = 'binary_glTF';
 let BINARY_EXTENSION_HEADER_MAGIC:string = 'glTF';

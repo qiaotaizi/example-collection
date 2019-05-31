@@ -14,7 +14,7 @@ import {
 
 import {Cloth, Constraint} from "./clothC";
 import {ClothConstants} from "./constants";
-import {JOrbitControls} from "../../JOrbitControls";
+import {JOrbitControls} from "../../../JControls/JOrbitControls";
 
 let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer;
 
