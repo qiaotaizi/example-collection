@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
-const MathUtils_1 = require("../../MathUtils");
+const MathUtils_1 = require("../../../utils/MathUtils");
 let camera, scene, renderer;
 // let activateCamera:Camera,activateCameraHelper:CameraHelper;
 let perspectiveCamera, orthographicCamera;

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
-const MathUtils_1 = require("../../MathUtils");
+const MathUtils_1 = require("../../../utils/MathUtils");
 let camera, scene, raycaster, renderer;
 let mouse = new three_1.Vector2(), INTERSECTED, oldColorHex;
 let theta = 0, radius = 100;

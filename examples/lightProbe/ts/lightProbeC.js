@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const three_1 = require("three");
-const ColorHelper_1 = require("../../ColorHelper");
+const ColorHelper_1 = require("../../../utils/ColorHelper");
 class LightProbeGenerator {
     static fromCubeTexture(cubeTexture) {
         let norm, lengthSq, weight, totalWeight = 0;

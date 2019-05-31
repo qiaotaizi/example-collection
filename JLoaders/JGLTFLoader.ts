@@ -85,7 +85,7 @@ export class JGLTFLoader{
 
     parse(data: ArrayBuffer | string, path: string, onLoad: (gltf: JGLTF) => void, onError?: (event: ErrorEvent) => void): void{
         let content;
-        let extensions:NameMap=[];
+        let extensions:NameMap={};
 
         if ( typeof data === 'string') {
             content = data;
