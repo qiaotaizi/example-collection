@@ -17,8 +17,7 @@
   },
   "dependencies": {
     "three": "^0.104.0",
-    "three-gltf-loader": "^1.104.0",
-    "three-orbitcontrols": "^2.102.1"
+    "three-gltf-loader": "^1.104.0"
   },
   "build": {
     "appId": "com.jaiz.study.example.collection",
