@@ -67,7 +67,7 @@ class JGLTFLoader {
     }
     parse(data, path, onLoad, onError) {
         let content;
-        let extensions = [];
+        let extensions = {};
         if (typeof data === 'string') {
             content = data;
         }
