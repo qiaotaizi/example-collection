@@ -1,4 +1,4 @@
-import {PerspectiveCamera, Scene, WebGLRenderer, GridHelper, Mesh, Material, Texture, MeshLambertMaterial, SphereBufferGeometry, Geometry, BufferGeometry, AmbientLight, DirectionalLight, PointLight, MeshBasicMaterial} from "three";
+import {PerspectiveCamera, Scene, WebGLRenderer, GridHelper, Mesh, Material, Texture, MeshLambertMaterial, SphereBufferGeometry, Geometry, BufferGeometry, AmbientLight, DirectionalLight, PointLight, MeshBasicMaterial, MeshPhongMaterial} from "three";
 
 let camera:PerspectiveCamera,scene:Scene,renderer:WebGLRenderer;
 
@@ -33,6 +33,8 @@ function init() {
     //一种非光泽表面的材质，没有镜面高光。
     mats.push(new MeshLambertMaterial({map:texture,transparent:true}));
     mats.push(new MeshLambertMaterial({color:0xdddddd}));
+    //一种用于具有镜面高光的光泽表面的材质。
+    mats.push(new MeshPhongMaterial({color:0xdddddd,specular:0x009900,shininess:30,flatShading:true}));
 
     //球体数组
     let geo=new SphereBufferGeometry(70,32,16);
