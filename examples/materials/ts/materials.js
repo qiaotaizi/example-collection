@@ -24,6 +24,11 @@ function init() {
     mats.push(new three_1.MeshLambertMaterial({ color: 0xdddddd }));
     //一种用于具有镜面高光的光泽表面的材质。
     mats.push(new three_1.MeshPhongMaterial({ color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true }));
+    //
+    mats.push(new three_1.MeshNormalMaterial());
+    //
+    mats.push(new three_1.MeshBasicMaterial({ color: 0xffaa00, transparent: true, blending: three_1.AdditiveBlending }));
+    mats.push(new three_1.MeshLambertMaterial({ color: 0xdddddd }));
     //球体数组
     let geo = new three_1.SphereBufferGeometry(70, 32, 16);
     for (let i = 0, l = mats.length; i < l; i++) {
