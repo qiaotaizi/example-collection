@@ -67,7 +67,8 @@ class JGLTFLoader {
     }
     parse(data, path, onLoad, onError) {
         let content;
-        let extensions = {};
+        //let extensions: NameMap = [];
+        let extensions = new Map();
         if (typeof data === 'string') {
             content = data;
         }
@@ -75,14 +76,14 @@ class JGLTFLoader {
             let magic = three_1.LoaderUtils.decodeText(new Uint8Array(data, 0, 4));
             if (magic === BINARY_EXTENSION_HEADER_MAGIC) {
                 try {
-                    extensions[EXTENSIONS.KHR_BINARY_GLTF] = new JGLTFBinaryExtension(data);
+                    extensions.set(EXTENSIONS.KHR_BINARY_GLTF, new JGLTFBinaryExtension(data));
                 }
                 catch (error) {
                     if (onError)
                         onError(error);
                     return;
                 }
-                content = extensions[EXTENSIONS.KHR_BINARY_GLTF].content;
+                content = extensions.get(EXTENSIONS.KHR_BINARY_GLTF).content;
             }
             else {
                 content = three_1.LoaderUtils.decodeText(new Uint8Array(data));
@@ -102,22 +103,28 @@ class JGLTFLoader {
                 let extensionsRequired = json.extensionsRequired || [];
                 switch (extensionName) {
                     case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
-                        extensions[extensionName] = new JGLTFLightsExtension(json);
+                        extensions.set(extensionName, new JGLTFLightsExtension(json));
+                        //extensions[extensionName] = new JGLTFLightsExtension(json);
                         break;
                     case EXTENSIONS.KHR_MATERIALS_UNLIT:
-                        // extensions[ extensionName ] = new GLTFMaterialsUnlitExtension( json );
+                        // extensions.set(extensionName, new GLTFMaterialsUnlitExtension(json));
+                        // extensions[extensionName] = new GLTFMaterialsUnlitExtension(json);
                         break;
                     case EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS:
-                        // extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension( json );
+                        // extensions.set(extensionName, new GLTFMaterialsPbrSpecularGlossinessExtension(json));
+                        // extensions[extensionName] = new GLTFMaterialsPbrSpecularGlossinessExtension(json);
                         break;
                     case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
-                        // extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( json, this.dracoLoader );
+                        // extensions.set(extensionName, new GLTFDracoMeshCompressionExtension(json, this.dracoLoader));
+                        // extensions[extensionName] = new GLTFDracoMeshCompressionExtension(json, this.dracoLoader);
                         break;
                     case EXTENSIONS.MSFT_TEXTURE_DDS:
-                        // extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension();
+                        // extensions.set(extensionName, new GLTFTextureDDSExtension());
+                        // extensions[EXTENSIONS.MSFT_TEXTURE_DDS] = new GLTFTextureDDSExtension();
                         break;
                     case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
-                        // extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] = new GLTFTextureTransformExtension( json );
+                        // extensions.set(extensionName, new GLTFTextureTransformExtension(json));
+                        // extensions[EXTENSIONS.KHR_TEXTURE_TRANSFORM] = new GLTFTextureTransformExtension(json);
                         break;
                     default:
                         if (extensionsRequired.indexOf(extensionName) >= 0) {
@@ -126,12 +133,12 @@ class JGLTFLoader {
                 }
             }
         }
-        let parser = new GLTFParser(json, extensions, {
+        let parser = new JGLTFParser(json, extensions, {
             path: path,
             crossOrigin: this.crossOrigin,
             manager: this.manager
         });
-        // parser.parse( onLoad, onError );
+        parser.parse(onLoad, onError);
     }
 }
 exports.JGLTFLoader = JGLTFLoader;
@@ -181,11 +188,210 @@ class JGLTFLightsExtension {
         this.lightDefs = extension.lights || [];
     }
 }
-class GLTFParser {
+class JGLTFParser {
     constructor(json, extensions, options) {
-        this.json = json || {};
-        this.extensions = extensions || {};
-        this.options = options || {};
+        this.json = json;
+        this.extensions = extensions;
+        this.options = options;
+        // loader object cache
+        this.cache = new JGLTFRegistry();
+        // BufferGeometry caching
+        this.primitiveCache = {};
+        this.textureLoader = new three_1.TextureLoader(this.options.manager);
+        this.textureLoader.setCrossOrigin(this.options.crossOrigin);
+        this.fileLoader = new three_1.FileLoader(this.options.manager);
+        this.fileLoader.setResponseType('arraybuffer');
+    }
+    parse(onLoad, onError) {
+        let parser = this;
+        let json = this.json;
+        let extensions = this.extensions;
+        // Clear the loader cache
+        this.cache.removeAll();
+        // Mark the special nodes/meshes in json for efficient parse
+        this.markDefs();
+        Promise.all([
+            this.getDependencies('scene'),
+            this.getDependencies('animation'),
+            this.getDependencies('camera'),
+        ]).then(function (dependencies) {
+            let result = {
+                scene: dependencies[0][json.scene || 0],
+                scenes: dependencies[0],
+                animations: dependencies[1],
+                cameras: dependencies[2],
+                asset: json.asset,
+                parser: parser,
+                userData: {}
+            };
+            // addUnknownExtensionsToUserData(extensions, result, json);
+            onLoad(result);
+        }).catch(onError);
+    }
+    /**
+     * Marks the special nodes/meshes in json for efficient parse.
+     */
+    markDefs() {
+        let nodeDefs = this.json.nodes || [];
+        let skinDefs = this.json.skins || [];
+        let meshDefs = this.json.meshes || [];
+        let meshReferences = [];
+        let meshUses = [];
+        // Nothing in the node definition indicates whether it is a Bone or an
+        // Object3D. Use the skins' joint references to mark bones.
+        for (let skinIndex = 0, skinLength = skinDefs.length; skinIndex < skinLength; skinIndex++) {
+            let joints = skinDefs[skinIndex].joints;
+            for (let i = 0, il = joints.length; i < il; i++) {
+                nodeDefs[joints[i]].isBone = true;
+            }
+        }
+        // Meshes can (and should) be reused by multiple nodes in a glTF asset. To
+        // avoid having more than one THREE.Mesh with the same name, count
+        // references and rename instances below.
+        //
+        // Example: CesiumMilkTruck sample model reuses "Wheel" meshes.
+        for (let nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex++) {
+            let nodeDef = nodeDefs[nodeIndex];
+            if (nodeDef.mesh !== undefined) {
+                if (meshReferences[nodeDef.mesh] === undefined) {
+                    meshReferences[nodeDef.mesh] = meshUses[nodeDef.mesh] = 0;
+                }
+                meshReferences[nodeDef.mesh]++;
+                // Nothing in the mesh definition indicates whether it is
+                // a SkinnedMesh or Mesh. Use the node's mesh reference
+                // to mark SkinnedMesh if node has skin.
+                if (nodeDef.skin !== undefined) {
+                    meshDefs[nodeDef.mesh].isSkinnedMesh = true;
+                }
+            }
+        }
+        this.json.meshReferences = meshReferences;
+        this.json.meshUses = meshUses;
+    }
+    /**
+     * Requests the specified dependency asynchronously, with caching.
+     * @param {string} type
+     * @param {number} index
+     * @return {Promise<THREE.Object3D|THREE.Material|THREE.Texture|THREE.AnimationClip|ArrayBuffer|Object>}
+     */
+    getDependency(type, index) {
+        var cacheKey = type + ':' + index;
+        var dependency = this.cache.get(cacheKey);
+        if (!dependency) {
+            switch (type) {
+                case 'scene':
+                    // dependency = this.loadScene(index);
+                    break;
+                case 'node':
+                    // dependency = this.loadNode(index);
+                    break;
+                case 'mesh':
+                    // dependency = this.loadMesh(index);
+                    break;
+                case 'accessor':
+                    // dependency = this.loadAccessor(index);
+                    break;
+                case 'bufferView':
+                    dependency = this.loadBufferView(index);
+                    break;
+                case 'buffer':
+                    dependency = this.loadBuffer(index);
+                    break;
+                case 'material':
+                    // dependency = this.loadMaterial(index);
+                    break;
+                case 'texture':
+                    // dependency = this.loadTexture(index);
+                    break;
+                case 'skin':
+                    // dependency = this.loadSkin(index);
+                    break;
+                case 'animation':
+                    // dependency = this.loadAnimation(index);
+                    break;
+                case 'camera':
+                    // dependency = this.loadCamera(index);
+                    break;
+                case 'light':
+                    dependency = this.extensions.get(EXTENSIONS.KHR_LIGHTS_PUNCTUAL).loadLight(index);
+                    break;
+                default:
+                    throw new Error('Unknown type: ' + type);
+            }
+            this.cache.add(cacheKey, dependency);
+        }
+        return dependency;
+    }
+    /**
+     * Requests all dependencies of the specified type asynchronously, with caching.
+     * @param {string} type
+     * @return {Promise<Array<Object>>}
+     */
+    getDependencies(type) {
+        let dependencies = this.cache.get(type);
+        if (!dependencies) {
+            let parser = this;
+            let defs = this.json[type + (type === 'mesh' ? 'es' : 's')] || [];
+            dependencies = Promise.all(defs.map(function (value, index) {
+                return parser.getDependency(type, index);
+            }));
+            this.cache.add(type, dependencies);
+        }
+        return dependencies;
+    }
+    /**
+     * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#buffers-and-buffer-views
+     * @param {number} bufferIndex
+     * @return {Promise<ArrayBuffer>}
+     */
+    loadBuffer(bufferIndex) {
+        let bufferDef = this.json.buffers[bufferIndex];
+        let loader = this.fileLoader;
+        if (bufferDef.type && bufferDef.type !== 'arraybuffer') {
+            throw new Error('THREE.GLTFLoader: ' + bufferDef.type + ' buffer type is not supported.');
+        }
+        // If present, GLB container is required to be the first buffer.
+        if (bufferDef.uri === undefined && bufferIndex === 0) {
+            return Promise.resolve(this.extensions.get(EXTENSIONS.KHR_BINARY_GLTF).body);
+        }
+        let options = this.options;
+        return new Promise(function (resolve, reject) {
+            // loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
+            //
+            //     reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
+            //
+            // } );
+        });
+    }
+    /**
+     * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#buffers-and-buffer-views
+     * @param {number} bufferViewIndex
+     * @return {Promise<ArrayBuffer>}
+     */
+    loadBufferView(bufferViewIndex) {
+        let bufferViewDef = this.json.bufferViews[bufferViewIndex];
+        return this.getDependency('buffer', bufferViewDef.buffer).then(function (buffer) {
+            let byteLength = bufferViewDef.byteLength || 0;
+            let byteOffset = bufferViewDef.byteOffset || 0;
+            return buffer.slice(byteOffset, byteOffset + byteLength);
+        });
+    }
+}
+class JGLTFRegistry {
+    constructor() {
+        this.objects = new Map();
+    }
+    get(key) {
+        return this.objects.get(key);
+    }
+    add(key, value) {
+        this.objects.set(key, value);
+    }
+    remove(key) {
+        this.objects.delete(key);
+    }
+    removeAll() {
+        this.objects.clear();
     }
 }
 //# sourceMappingURL=JGLTFLoader.js.map
